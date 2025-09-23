@@ -1,0 +1,18 @@
+A community web chat.
+
+> real time chatting.
+> chat history is saved.
+> whenever you login you will get the previous chats to.
+> When the user leaves the chat, 'disconnected message is shown'.
+
+This was just a testing phase.
+
+Further features which can be added.
+> Total users online in community (in real time)
+> Chat personally
+> delete the chat
+> Encrypted messages, and user information
+> We will switch to recommended database suitable for this purpose
+> date and time of message
+> Improved UI.
+> File sharing.
