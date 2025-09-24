@@ -1,10 +1,12 @@
-import sqlite3
-import os
+from config.mongoConfig import client
 
-def add_user(username, password):
-    db_path = os.path.join("database", "user.db")
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
-    conn.commit()
-    conn.close()
+
+async def create_user(collection_name:str, user_data:dict):
+    db = client["Users"]
+    collection = db[collection_name]
+
+    # Insert the new user document
+    result = await collection.insert_one(user_data)
+
+    print(f"New user created with _id: {result.inserted_id}")
+

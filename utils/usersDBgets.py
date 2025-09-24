@@ -1,27 +1,19 @@
-def get_user_data():
-    import sqlite3
-    import os
+from config.mongoConfig import client
 
-    db_path = os.path.join("database", "user.db")
 
-    if not os.path.exists(db_path):
-        print("Database does not exist.")
-        return {}
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+async def get_all_user():
+    db = client["Users"]
+    
+    collections = await db.list_collection_names()
+    
+    return collections
 
-    cursor.execute("""
-        SELECT name FROM sqlite_master WHERE type='table' AND name='users';
-    """)
-    if cursor.fetchone() is None:
-        print("Users table does not exist.")
-        conn.close()
-        return {}
+async def get_user_cred(collection_name):
+    db = client["Users"]
+    collection = db[collection_name]
 
-    cursor.execute("SELECT username, password FROM users")
-    rows = cursor.fetchall()
-    conn.close()
+    documents = await collection.find({}, {"_id": 0}).to_list()
 
-    user_dict = {username: password for username, password in rows}
-    return user_dict
+    results = list(documents)
+    return results
 
