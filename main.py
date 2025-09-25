@@ -56,7 +56,7 @@ async def Register(request: Request):
 async def websocket_endpoint(user_id: str, websocket: WebSocket):
     await websocket.accept()
     connected_users[user_id] = websocket
-    print(f"Connected users: {list(connected_users.keys())}")
+    # print(f"Connected users: {list(connected_users.keys())}")
 
     try:
         while True:
@@ -68,7 +68,7 @@ async def websocket_endpoint(user_id: str, websocket: WebSocket):
                 recipient = payload.get("to")
                 message = payload.get("msg")
             except json.JSONDecodeError:
-                print("Invalid payload, ignoring:", data)
+                # print("Invalid payload, ignoring:", data)
                 continue
 
             # Save chat
@@ -76,14 +76,14 @@ async def websocket_endpoint(user_id: str, websocket: WebSocket):
             contact_key = await get_user_contacts_key(collection_name = user_id, contact_name = recipient)
             await insert_chat(collection_name=contact_key, user = user_id, message = message)
             # Send to recipient only
-            print(message)
+            # print(message)
             if recipient in connected_users:
                 await connected_users[recipient].send_text(f"{user_id}: {message}")
             else:
-                print(f"Recipient {recipient} not connected")
+                await insert_chat(collection_name=contact_key, user = user_id, message = message)
 
     except WebSocketDisconnect:
-        print(f"{user_id} disconnected")
+        # print(f"{user_id} disconnected")
         try:
             await connected_users[recipient].send_text(f"{user_id}: DISCONNECTED")
         except KeyError:
@@ -152,8 +152,8 @@ from fastapi import Body
 async def chat_history(data: dict = Body(...)):
     user = data.get("user")
     contact = data.get("contact")
-    print(user)
-    print(contact)
+    # print(user)
+    # print(contact)
     # Dummy data → Replace with DB logic
     contact_key = await get_user_contacts_key(collection_name=user, contact_name=contact)
 
@@ -167,7 +167,7 @@ async def chat_history(data: dict = Body(...)):
     print(history)
     return history
 
-
+# print()
 @app.post("/save-unique-id")
 async def update_id(request:Request, data:dict = Body(...)):
     unique_id = data.get("unique_id")
