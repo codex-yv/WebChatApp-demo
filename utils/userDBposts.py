@@ -10,3 +10,4 @@ async def create_user(collection_name:str, user_data:dict):
 
     print(f"New user created with _id: {result.inserted_id}")
 
+

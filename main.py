@@ -1,5 +1,5 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, Form, Body
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,11 +9,11 @@ from starlette.status import HTTP_303_SEE_OTHER
 from schemas.loginSchemas import Loign
 from schemas.signupSchemas import SignUp
 from utils.userDBposts import create_user
-from utils.usersDBgets import get_all_user, get_user_cred
-from utils.userPuts import update_user_status
-from utils.chatsDB import create_chat_history_db
+from utils.usersDBgets import get_all_user, get_user_cred, get_all_keys, get_user_cred_key, get_user_cred_contacts, get_user_contacts_key
+from utils.userPuts import update_user_cred_one, update_user_contact, update_contact_keys
+from utils.chatsDB import create_contact
 from utils.chatsDBposts import insert_chat
-from utils.chatsDBgets import get_all_chats
+from utils.chatsDBgets import get_chat
 import json
 
 
@@ -42,8 +42,6 @@ connected_users = {}
 
 @app.get("/")
 async def get(request: Request):
-
-    await create_chat_history_db()
     return {"Message":"Welcome"}
 
 @app.get("/login", response_class=HTMLResponse)
@@ -57,40 +55,51 @@ async def Register(request: Request):
 @app.websocket("/ws/{user_id}")
 async def websocket_endpoint(user_id: str, websocket: WebSocket):
     await websocket.accept()
-
     connected_users[user_id] = websocket
-    print(f"Connected users: {connected_users.keys()}")
-    
+    print(f"Connected users: {list(connected_users.keys())}")
+
     try:
         while True:
             data = await websocket.receive_text()
-            print(f"Received from {user_id}: {data}")
-            await insert_chat(user_id, data)
-            # Broadcast to other users
-            for user, user_ws in connected_users.items():
-                if user != user_id:
-                    await user_ws.send_text(f"{user_id}: {data}")
+            print(f"Received raw from {user_id}: {data}")
 
-            
+            try:
+                payload = json.loads(data)  # expecting {"to": "...", "msg": "..."}
+                recipient = payload.get("to")
+                message = payload.get("msg")
+            except json.JSONDecodeError:
+                print("Invalid payload, ignoring:", data)
+                continue
+
+            # Save chat
+            # await insert_chat(user_id, recipient, message)
+            contact_key = await get_user_contacts_key(collection_name = user_id, contact_name = recipient)
+            await insert_chat(collection_name=contact_key, user = user_id, message = message)
+            # Send to recipient only
+            print(message)
+            if recipient in connected_users:
+                await connected_users[recipient].send_text(f"{user_id}: {message}")
+            else:
+                print(f"Recipient {recipient} not connected")
+
     except WebSocketDisconnect:
         print(f"{user_id} disconnected")
-        # await insert_chat(user_id, "disconnected")
-
-        for user, user_ws in connected_users.items():
-            if user != user_id:
-                await user_ws.send_text(f"{user_id}: disconnected")
+        try:
+            await connected_users[recipient].send_text(f"{user_id}: DISCONNECTED")
+        except KeyError:
+            pass
+        await insert_chat(collection_name=contact_key, user = user_id, message = "DISCONNECTED")
         try:
             del connected_users[user_id]
         except KeyError:
             pass
 
     finally:
-        # Do not try to close if already closed
-        if not websocket.client_state.name == "DISCONNECTED":
+        if websocket.client_state.name != "DISCONNECTED":
             try:
                 await websocket.close()
             except RuntimeError:
-                pass  # Silently ignore double close attempts
+                pass
 
 @app.post("/login")
 async def submitLogin(request: Request, values:Loign = Form(...)):
@@ -103,11 +112,11 @@ async def submitLogin(request: Request, values:Loign = Form(...)):
         request.session["password"] = password
 
 
-        await update_user_status(collection_name=values.username, password_value= values.password, new_status="ACTIVE")
+        await update_user_cred_one(collection_name=values.username, password_value= values.password, field_name="status" ,new_value="ACTIVE")
         if values.password == password:
-            chat_data = get_all_chats()
-            contacts = ["Liam", "Sophia", "Ethan"]
-            return templates.TemplateResponse("index.html", {"request": request, "user": values.username, "chat_history":chat_data, "contacts": contacts})
+
+            contacts = await get_user_cred_contacts(collection_name=values.username)
+            return templates.TemplateResponse("index.html", {"request": request, "user": values.username, "chat_history":[], "contacts": contacts})
         else:
             return {"Message":"Invalid Password"}
     else:
@@ -121,6 +130,7 @@ async def submitRegister(request: Request, values:SignUp = Form(...)):
             "password":values.password,
             "status":"ACTIVE",
             "contacts":[],
+            "contact_keys":{},
             "key":""
         }
         await create_user(collection_name=values.username, user_data=new_data)
@@ -128,9 +138,10 @@ async def submitRegister(request: Request, values:SignUp = Form(...)):
         request.session["username"] = values.username
         request.session["password"] = values.password
 
-        chat_data = get_all_chats()
-        contacts = ["Liam", "Sophia", "Ethan"]
-        return templates.TemplateResponse("index.html", {"request": request, "user": values.username, "chat_history":chat_data, "contacts": contacts})
+        
+        contacts = await get_user_cred_contacts(collection_name=values.username)
+        
+        return templates.TemplateResponse("index.html", {"request": request, "user": values.username, "chat_history":[], "contacts": contacts})
     else:
         return {"Message":"User already exist!"}
     
@@ -144,12 +155,55 @@ async def chat_history(data: dict = Body(...)):
     print(user)
     print(contact)
     # Dummy data → Replace with DB logic
+    contact_key = await get_user_contacts_key(collection_name=user, contact_name=contact)
+
+    chat_data = await get_chat(collection_name=contact_key)
     sample_history = {
-        ("yv856", "Sophia"): [("yv856", "Hey Sophia!"), ("Sophia", "Hi Liam!")],
-        ("admin", "Ethan"): [("admin", "Hello Ethan"), ("Ethan", "Hey Sophia!")],
+        (user, contact): chat_data,
     }
     
     # Get both directions of conversation
     history = sample_history.get((user, contact), []) + sample_history.get((contact, user), [])
     print(history)
     return history
+
+
+@app.post("/save-unique-id")
+async def update_id(request:Request, data:dict = Body(...)):
+    unique_id = data.get("unique_id")
+    all_keys = await get_all_keys()
+
+    if unique_id not in all_keys:
+        await update_user_cred_one(collection_name=request.session.get("username"),
+                                   password_value=request.session.get("password"), field_name="key", new_value=unique_id)
+    
+        return JSONResponse({"success": True})
+    else:
+        return JSONResponse({"success": False})
+
+@app.post("/connect-user")
+async def connect_user(request:Request, data:dict = Body(...)):
+    new_user = data.get("username")
+    key = data.get("key")
+    current_user = request.session.get("username")
+    all_users = await get_all_user()
+    if new_user in all_users and new_user != current_user:
+        get_key = await get_user_cred_key(collection_name=new_user)
+        if get_key == key:
+
+            await update_user_contact(collection_name = new_user, field_name ="key", field_value = get_key, new_contact = current_user)
+            await update_user_contact(collection_name = current_user, field_name ="password", field_value = request.session.get("password"), new_contact = new_user)
+            contact_format = new_user + current_user 
+            await update_contact_keys(collection_name=current_user, field_name="password", field_value=request.session.get("password"), new_contact=new_user, key=contact_format)
+            await update_contact_keys(collection_name=new_user, field_name="key", field_value=key, new_contact=current_user, key=contact_format )
+            chat = {
+                "user":current_user,
+                "message": f"{current_user} INITIATED THE CHAT"
+            }
+            await create_contact(collection_name=contact_format, user_data=chat)
+
+            contact_list = await get_user_cred_contacts(collection_name=current_user)    
+            return contact_list
+    else:
+        return False
+

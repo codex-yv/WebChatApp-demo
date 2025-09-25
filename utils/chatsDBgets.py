@@ -1,14 +1,12 @@
-import sqlite3
-import os
+from config.mongoConfig import client
 
-def get_all_chats():
-    db_path = os.path.join("database", "chatHistory.db")
-    conn = sqlite3.connect(db_path)
-    
-    cursor = conn.cursor()
+async def get_chat(collection_name):
+    db = client['Contacts']
+    collection = db[collection_name]  # replace with actual collection name
 
-    cursor.execute("SELECT username, data FROM community")
-    rows = cursor.fetchall()
+    # Fetch all documents
+    data = await collection.find().to_list()
 
-    conn.close()
-    return rows
+    # Format and print data
+    formatted_data = [(doc['user'], doc['message']) for doc in data]
+    return formatted_data

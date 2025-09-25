@@ -11,12 +11,36 @@
     <!-- LEFT: CONTACTS -->
     <div class="w-1/3 border-r flex flex-col">
       <!-- Header with single profile icon (current user) -->
-      <div class="px-4 py-3 border-b flex items-center gap-3">
-        <div id="userAvatar"
-             class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold cursor-pointer"
-             title="Click to set Unique Key"
-             onclick="openModal()"></div>
-        <h2 class="text-lg font-semibold">Contacts</h2>
+      <div class="px-4 py-3 border-b flex items-center justify-between">
+        <!-- Left side: User Avatar + Contacts text -->
+        <div class="flex items-center gap-3">
+          <div id="userAvatar"
+              class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold cursor-pointer"
+              title="Click to set Unique Key"
+              onclick="openModal()"></div>
+          <h2 class="text-lg font-semibold">Contacts</h2>
+        </div>
+
+        <!-- Right side: Menu button -->
+        <div class="relative">
+          <button id="menuBtn"
+                  class="p-2 rounded-full hover:bg-gray-100 focus:outline-none"
+                  onclick="toggleMenu()">
+            ⋮
+          </button>
+          <!-- Dropdown Menu -->
+          <div id="menuDropdown"
+              class="hidden absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-10">
+            <button onclick="addNewUser()"
+                    class="block w-full text-left px-4 py-2 hover:bg-gray-100">
+              Add new user
+            </button>
+            <button onclick="showNotifications()"
+                    class="block w-full text-left px-4 py-2 hover:bg-gray-100">
+              Notification
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Contacts list -->
@@ -41,7 +65,32 @@
       </div>
     </div>
   </div>
+  <!-- Add New User Modal -->
+  <div id="addUserModal"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+      <h2 class="text-xl font-semibold mb-4">Add New User</h2>
 
+      <label class="block mb-2 text-sm font-medium">Username</label>
+      <input id="newUsername" type="text"
+            class="w-full px-3 py-2 border rounded mb-4"
+            placeholder="Enter username">
+
+      <label class="block mb-2 text-sm font-medium">Key</label>
+      <input id="newUserKey" type="text"
+            class="w-full px-3 py-2 border rounded mb-4"
+            placeholder="Enter key">
+
+      <div id="addUserMessage" class="text-sm mb-3"></div>
+
+      <div class="flex justify-end gap-3">
+        <button onclick="closeAddUserModal()"
+                class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+        <button onclick="connectUser()"
+                class="px-4 py-2 bg-blue-600 text-white rounded">Connect</button>
+      </div>
+    </div>
+  </div>
   <!-- Hidden user and contacts data injected by FastAPI/Jinja -->
   <h2 id="username" class="hidden">{{ user }}</h2>
   <script id="contacts-data" type="application/json">{{ contacts | tojson }}</script>
@@ -239,7 +288,7 @@
       if (!activeChatUser) return alert("Please select a contact first.");
 
       if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(msg); // backend expects raw message text
+        ws.send(JSON.stringify({ to: activeChatUser, msg })); // backend expects raw message text
         appendMessage(currentUser, msg);
         msgInput.value = "";
       } else {
@@ -282,6 +331,87 @@
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+    }
+
+    function toggleMenu() {
+      const dropdown = document.getElementById("menuDropdown");
+      dropdown.classList.toggle("hidden");
+    }
+
+    // Example handlers
+    function addNewUser() {
+      openAddUserModal();
+      toggleMenu();
+    }
+
+    function showNotifications() {
+      alert("Notification clicked!");
+      toggleMenu();
+    }
+
+    // Close menu if clicked outside
+    window.addEventListener("click", function (e) {
+      const menuBtn = document.getElementById("menuBtn");
+      const dropdown = document.getElementById("menuDropdown");
+      if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add("hidden");
+      }
+    });
+
+    function openAddUserModal() {
+      document.getElementById("addUserModal").classList.remove("hidden");
+    }
+
+    function closeAddUserModal() {
+      document.getElementById("addUserModal").classList.add("hidden");
+      document.getElementById("addUserMessage").innerText = "";
+    }
+
+    async function connectUser() {
+      const username = document.getElementById("newUsername").value.trim();
+      const key = document.getElementById("newUserKey").value.trim();
+      const messageEl = document.getElementById("addUserMessage");
+
+      if (!username || !key) {
+        messageEl.innerText = "Both fields are required.";
+        messageEl.className = "text-sm text-red-600 mb-3";
+        return;
+      }
+
+      try {
+        const res = await fetch("/connect-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, key })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+
+          if (Array.isArray(data)) {
+            // ✅ Server returned updated contacts list
+            updateContactList(data);
+            closeAddUserModal();
+          } else {
+            // ❌ Server returned False
+            document.getElementById("addUserMessage").innerText =
+              "Given data doesn't match any users.";
+            document.getElementById("addUserMessage").className =
+              "text-sm text-red-600 mt-3";
+          }
+        } else {
+          messageEl.innerText = "Server error.";
+          messageEl.className = "text-sm text-red-600 mb-3";
+        }
+      } catch (err) {
+        console.error("connectUser error:", err);
+        messageEl.innerText = "Error connecting user.";
+        messageEl.className = "text-sm text-red-600 mb-3";
+      }
+    }
+
+    function updateContactList(contacts) {
+      renderContacts(contacts);
     }
   </script>
 </body>

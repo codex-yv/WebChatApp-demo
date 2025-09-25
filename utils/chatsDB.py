@@ -1,23 +1,11 @@
-import sqlite3
-import os
+from config.mongoConfig import client
 
-async def create_chat_history_db():
-    folder = "database"
-    db_path = os.path.join(folder, "chatHistory.db")
+async def create_contact(collection_name:str, user_data:dict):
+    db = client["Contacts"]
+    collection = db[collection_name]
 
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+    # Insert the new user document
+    result = await collection.insert_one(user_data)
 
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS community (
-            username TEXT,
-            data TEXT
-        )
-    """)
-
-    conn.commit()
-    conn.close()
+    print(f"New user created with _id: {result.inserted_id}")
 

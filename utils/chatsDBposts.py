@@ -1,12 +1,13 @@
-import sqlite3
-import os
+from config.mongoConfig import client
 
-async def insert_chat(username, data):
-    db_path = os.path.join("database", "chatHistory.db")
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+async def insert_chat(collection_name, user, message):
+    db = client["Contacts"]
+    collection = db[collection_name]
 
-    cursor.execute("INSERT INTO community (username, data) VALUES (?, ?)", (username, data))
+    data = {
+        "user":user,
+        "message":message
+    }
 
-    conn.commit()
-    conn.close()
+    await collection.insert_one(data)
+
