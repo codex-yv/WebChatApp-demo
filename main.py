@@ -42,7 +42,7 @@ connected_users = {}
 
 @app.get("/")
 async def get(request: Request):
-    return {"Message":"Welcome"}
+    return templates.TemplateResponse("homepage.html", {"request": request})
 
 @app.get("/login", response_class=HTMLResponse)
 async def Login(request: Request):
@@ -61,7 +61,7 @@ async def websocket_endpoint(user_id: str, websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            print(f"Received raw from {user_id}: {data}")
+            # print(f"Received raw from {user_id}: {data}")
 
             try:
                 payload = json.loads(data)  # expecting {"to": "...", "msg": "..."}
@@ -86,7 +86,7 @@ async def websocket_endpoint(user_id: str, websocket: WebSocket):
         # print(f"{user_id} disconnected")
         try:
             await connected_users[recipient].send_text(f"{user_id}: DISCONNECTED")
-        except KeyError:
+        except (KeyError, UnboundLocalError): # add unboundlocal error too
             pass
         await insert_chat(collection_name=contact_key, user = user_id, message = "DISCONNECTED")
         try:
@@ -118,9 +118,9 @@ async def submitLogin(request: Request, values:Loign = Form(...)):
             contacts = await get_user_cred_contacts(collection_name=values.username)
             return templates.TemplateResponse("index.html", {"request": request, "user": values.username, "chat_history":[], "contacts": contacts})
         else:
-            return {"Message":"Invalid Password"}
+            return 102
     else:
-        return {"Message":"Invalid Username"}
+        return 101
     
 @app.post("/register")
 async def submitRegister(request: Request, values:SignUp = Form(...)):
@@ -143,7 +143,7 @@ async def submitRegister(request: Request, values:SignUp = Form(...)):
         
         return templates.TemplateResponse("index.html", {"request": request, "user": values.username, "chat_history":[], "contacts": contacts})
     else:
-        return {"Message":"User already exist!"}
+        return 0
     
 
 from fastapi import Body
@@ -164,7 +164,7 @@ async def chat_history(data: dict = Body(...)):
     
     # Get both directions of conversation
     history = sample_history.get((user, contact), []) + sample_history.get((contact, user), [])
-    print(history)
+    # print(history)
     return history
 
 # print()

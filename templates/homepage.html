@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <script src="https://static.readdy.ai/static/e.js"></script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Whispr - Private Chat Without Limits</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ffff',
+                        secondary: '#8b5cf6'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
+    <style>
+        :where([class^="ri-"])::before {
+            content: "\f3c2";
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .glow-border {
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .glow-border-purple {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .hero-bg {
+            background: radial-gradient(ellipse at center, rgba(0, 255, 255, 0.1) 0%, transparent 70%),
+                linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        }
+
+        .feature-card {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .input-glow {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .input-glow:focus {
+            border-color: rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(0, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) translateX(0px);
+                opacity: 0;
+            }
+
+            50% {
+                transform: translateY(-20px) translateX(10px);
+                opacity: 1;
+            }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            from {
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            }
+
+            to {
+                box-shadow: 0 0 40px rgba(0, 255, 255, 0.6);
+            }
+        }
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 300;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuOKfMZg.ttf) format('truetype');
+        }
+            @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZg.ttf) format('truetype');
+        }
+            @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuI6fMZg.ttf) format('truetype');
+        }
+            @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuGKYMZg.ttf) format('truetype');
+        }
+            @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZg.ttf) format('truetype');
+        }
+            @font-face {
+            font-family: 'Pacifico';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/pacifico/v23/FwZY7-Qmy14u9lezJ96A.ttf) format('truetype');
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen">
+    <nav class="fixed top-0 w-full z-50 bg-gray-900/90 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="font-['Pacifico'] text-2xl text-primary glow-text">Whispr</h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <button
+                        class="px-6 py-2 border border-primary text-primary hover:bg-primary hover:text-gray-900 transition-all duration-300 !rounded-button whitespace-nowrap glow-border"
+                        onclick="openSignInModal()">
+                        Sign In
+                    </button>
+                    <button
+                        class="px-6 py-2 bg-secondary text-white hover:bg-purple-600 transition-all duration-300 !rounded-button whitespace-nowrap glow-border-purple"
+                        onclick="openSignUpModal()">
+                        Sign Up
+                    </button>
+                </div>
+                <div class="md:hidden">
+                    <button class="w-8 h-8 flex items-center justify-center text-primary" onclick="toggleMobileMenu()">
+                        <i class="ri-menu-line ri-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="hidden md:hidden bg-gray-900/95 backdrop-blur-md border-t border-gray-800" id="mobileMenu">
+            <div class="px-4 py-4 space-y-3">
+                <button
+                    class="w-full px-6 py-2 border border-primary text-primary hover:bg-primary hover:text-gray-900 transition-all duration-300 !rounded-button whitespace-nowrap glow-border"
+                    onclick="openSignInModal()">
+                    Sign In
+                </button>
+                <button
+                    class="w-full px-6 py-2 bg-secondary text-white hover:bg-purple-600 transition-all duration-300 !rounded-button whitespace-nowrap glow-border-purple"
+                    onclick="openSignUpModal()">
+                    Sign Up
+                </button>
+            </div>
+        </div>
+    </nav>
+    <main class="pt-16">
+        <section class="hero-bg min-h-screen flex items-center justify-center relative overflow-hidden"
+            style="background-image: url('https://readdy.ai/api/search-image?query=happy%20young%20couple%20chatting%20on%20smartphones%20in%20modern%20minimalist%20setting%20with%20soft%20lighting%2C%20warm%20and%20friendly%20atmosphere%2C%20people%20enjoying%20private%20conversation%2C%20contemporary%20lifestyle%20photography%20with%20subtle%20tech%20elements%2C%20clean%20background%20with%20gentle%20gradients%20and%20soft%20shadows%2C%20romantic%20and%20secure%20communication%20theme&amp;width=1920&amp;height=1080&amp;seq=hero-bg&amp;orientation=landscape'); background-size: cover; background-position: center; background-blend-mode: overlay;">
+            <div class="absolute inset-0 bg-gradient-to-br from-gray-900/80 to-gray-800/90"></div>
+            <div class="particles">
+                <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+                <div class="particle" style="left: 20%; animation-delay: 1s;"></div>
+                <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
+                <div class="particle" style="left: 40%; animation-delay: 3s;"></div>
+                <div class="particle" style="left: 50%; animation-delay: 4s;"></div>
+                <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
+                <div class="particle" style="left: 70%; animation-delay: 0.5s;"></div>
+                <div class="particle" style="left: 80%; animation-delay: 1.5s;"></div>
+                <div class="particle" style="left: 90%; animation-delay: 2.5s;"></div>
+            </div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 glow-text">
+                    Chat Without Limits,<br />
+                    <span class="text-primary">Privacy Without Compromise</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+                    No email, no phone number, no hassle. Just create your account, share your custom key, and start
+                    secure conversations instantly.
+                </p>
+                <button
+                    class="btn-primary px-8 py-4 text-lg font-semibold text-gray-900 !rounded-button whitespace-nowrap pulse-glow"
+                    onclick="openSignUpModal()">
+                    Start Chatting Now
+                </button>
+            </div>
+        </section>
+        <section class="py-20 bg-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 glow-text">Why Choose Whispr?</h2>
+                    <p class="text-xl text-gray-400 max-w-2xl mx-auto">Experience the future of private messaging with
+                        cutting-edge security and seamless communication.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="feature-card p-8 rounded-xl text-center">
+                        <div class="w-16 h-16 flex items-center justify-center mx-auto mb-6 bg-primary/10 rounded-full">
+                            <i class="ri-shield-cross-line ri-2x text-primary"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-primary">Zero Personal Data</h3>
+                        <p class="text-gray-300 leading-relaxed">Chat instantly without sharing email or phone number.
+                            Your identity remains completely private and secure.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center">
+                        <div
+                            class="w-16 h-16 flex items-center justify-center mx-auto mb-6 bg-secondary/10 rounded-full">
+                            <i class="ri-key-2-line ri-2x text-secondary"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-secondary">Your Unique Key</h3>
+                        <p class="text-gray-300 leading-relaxed">Generate and share your custom key to connect with
+                            others. Simple, secure, and completely under your control.</p>
+                    </div>
+                    <div class="feature-card p-8 rounded-xl text-center">
+                        <div
+                            class="w-16 h-16 flex items-center justify-center mx-auto mb-6 bg-green-400/10 rounded-full">
+                            <i class="ri-lock-2-line ri-2x text-green-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 text-green-400">Military-Grade Encryption</h3>
+                        <p class="text-gray-300 leading-relaxed">All messages stored in encrypted form for maximum
+                            privacy. Your conversations stay completely secure.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-20 bg-gradient-to-br from-gray-900 to-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold mb-6 glow-text">Your Privacy is Our Priority</h2>
+                        <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                            Experience true privacy with end-to-end encryption, zero data mining, and secure storage.
+                            Your conversations belong to you and you alone.
+                        </p>
+                        <ul class="space-y-4">
+                            <li class="flex items-center space-x-3">
+                                <div class="w-6 h-6 flex items-center justify-center">
+                                    <i class="ri-check-line text-primary"></i>
+                                </div>
+                                <span class="text-gray-300">End-to-end encrypted messaging</span>
+                            </li>
+                            <li class="flex items-center space-x-3">
+                                <div class="w-6 h-6 flex items-center justify-center">
+                                    <i class="ri-check-line text-primary"></i>
+                                </div>
+                                <span class="text-gray-300">No data collection or mining</span>
+                            </li>
+                            <li class="flex items-center space-x-3">
+                                <div class="w-6 h-6 flex items-center justify-center">
+                                    <i class="ri-check-line text-primary"></i>
+                                </div>
+                                <span class="text-gray-300">Secure cloud storage with encryption</span>
+                            </li>
+                            <li class="flex items-center space-x-3">
+                                <div class="w-6 h-6 flex items-center justify-center">
+                                    <i class="ri-check-line text-primary"></i>
+                                </div>
+                                <span class="text-gray-300">Complete message history protection</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="relative">
+                        <div class="aspect-square rounded-2xl overflow-hidden glow-border">
+                            <img alt="Privacy and Security" class="w-full h-full object-cover object-top"
+                                src="https://readdy.ai/api/search-image?query=futuristic%20digital%20privacy%20concept%20with%20encrypted%20messages%20floating%20in%20dark%20cyberspace%2C%20glowing%20cyan%20and%20purple%20security%20shields%20protecting%20data%2C%20minimalist%20tech%20illustration%20with%20geometric%20patterns%20and%20secure%20communication%20symbols%2C%20high-tech%20privacy%20visualization&amp;width=600&amp;height=600&amp;seq=privacy-hero&amp;orientation=squarish" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-20 bg-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 glow-text">Powerful Features</h2>
+                    <p class="text-xl text-gray-400 max-w-2xl mx-auto">Everything you need for secure, private, and
+                        engaging conversations.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div class="w-12 h-12 flex items-center justify-center mx-auto mb-4 bg-primary/10 rounded-full">
+                            <i class="ri-group-line ri-lg text-primary"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-primary">Create Communities</h3>
+                        <p class="text-gray-400 text-sm">Build and manage private chat communities with ease.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div
+                            class="w-12 h-12 flex items-center justify-center mx-auto mb-4 bg-secondary/10 rounded-full">
+                            <i class="ri-user-smile-line ri-lg text-secondary"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-secondary">Profile Pictures</h3>
+                        <p class="text-gray-400 text-sm">Customize your profile with personal avatars.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div
+                            class="w-12 h-12 flex items-center justify-center mx-auto mb-4 bg-green-400/10 rounded-full">
+                            <i class="ri-image-line ri-lg text-green-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-green-400">Photo Sharing</h3>
+                        <p class="text-gray-400 text-sm">Share photos securely with encrypted transmission.</p>
+                    </div>
+                    <div class="feature-card p-6 rounded-xl text-center">
+                        <div
+                            class="w-12 h-12 flex items-center justify-center mx-auto mb-4 bg-yellow-400/10 rounded-full">
+                            <i class="ri-contacts-book-line ri-lg text-yellow-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-yellow-400">Contact Management</h3>
+                        <p class="text-gray-400 text-sm">Organize and manage your connections efficiently.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-20 bg-gradient-to-br from-primary/5 to-secondary/5">
+            <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 glow-text">Ready to Experience True Private Messaging?
+                </h2>
+                <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                    Join thousands of users who have already discovered the freedom of secure, private communication
+                    without compromising their personal data.
+                </p>
+                <button
+                    class="btn-primary px-8 py-4 text-lg font-semibold text-gray-900 !rounded-button whitespace-nowrap pulse-glow"
+                    onclick="openSignUpModal()">
+                    Join Whispr Today
+                </button>
+            </div>
+        </section>
+    </main>
+    <footer class="bg-gray-900 border-t border-gray-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h3 class="font-['Pacifico'] text-2xl text-primary glow-text mb-4">Whispr</h3>
+                <p class="text-gray-400 mb-6">Private messaging without limits</p>
+                <div class="flex justify-center space-x-6">
+                    <a class="text-gray-400 hover:text-primary transition-colors" href="#">Privacy Policy</a>
+                    <a class="text-gray-400 hover:text-primary transition-colors" href="#">Terms of Service</a>
+                    <a class="text-gray-400 hover:text-primary transition-colors" href="#">Support</a>
+                </div>
+                <p class="text-gray-500 text-sm mt-6">© 2025 Whispr. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <div class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay" id="signInModal">
+        <div class="modal-content rounded-xl p-8 w-full max-w-md mx-4 glow-border">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-primary glow-text">Sign In</h2>
+                <button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white"
+                    onclick="closeSignInModal()">
+                    <i class="ri-close-line ri-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleSignIn(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+                        <input class="input-glow w-full px-4 py-3 rounded-lg text-white placeholder-gray-500"
+                            placeholder="Enter your username" required="" type="text" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                        <input class="input-glow w-full px-4 py-3 rounded-lg text-white placeholder-gray-500"
+                            placeholder="Enter your password" required="" type="password" />
+                    </div>
+                </div>
+                <button
+                    class="btn-primary w-full px-6 py-3 text-gray-900 font-semibold !rounded-button whitespace-nowrap mt-6"
+                    type="submit">
+                    Sign In
+                </button>
+                <p class="text-center text-gray-400 text-sm mt-4">
+                    Don't have an account?
+                    <button class="text-primary hover:underline" onclick="switchToSignUp()" type="button">Sign up
+                        here</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    <div class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay" id="signUpModal">
+        <div class="modal-content rounded-xl p-8 w-full max-w-md mx-4 glow-border">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-secondary glow-text">Sign Up</h2>
+                <button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white"
+                    onclick="closeSignUpModal()">
+                    <i class="ri-close-line ri-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleSignUp(event)">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+                        <input name="username" class="input-glow w-full px-4 py-3 rounded-lg text-white placeholder-gray-500"
+                            placeholder="Choose a username" required type="text" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                        <input name="password" class="input-glow w-full px-4 py-3 rounded-lg text-white placeholder-gray-500"
+                            placeholder="Create a password" required type="password" />
+                    </div>
+                    <div class="flex items-start space-x-3 mt-4">
+                        <input class="mt-1 opacity-0 absolute" id="termsCheckbox" required type="checkbox" />
+                        <div class="relative">
+                            <div class="w-5 h-5 border-2 border-primary rounded flex items-center justify-center cursor-pointer"
+                                onclick="toggleCheckbox()">
+                                <i class="ri-check-line text-primary text-sm hidden" id="checkIcon"></i>
+                            </div>
+                        </div>
+                        <label class="text-sm text-gray-300 cursor-pointer" for="termsCheckbox">
+                            I agree to the <a class="text-primary hover:underline" href="#">Terms of Service</a>
+                        </label>
+                    </div>
+                </div>
+                <button
+                    class="btn-secondary w-full px-6 py-3 text-white font-semibold !rounded-button whitespace-nowrap mt-6"
+                    type="submit">
+                    Create Account
+                </button>
+            </form>
+        </div>
+    </div>
+    <script id="navigation-script">
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
+    <script id="modal-management-script">
+        function openSignInModal() {
+            document.getElementById('signInModal').classList.remove('hidden');
+            document.getElementById('signInModal').classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSignInModal() {
+            document.getElementById('signInModal').classList.add('hidden');
+            document.getElementById('signInModal').classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+        function openSignUpModal() {
+            document.getElementById('signUpModal').classList.remove('hidden');
+            document.getElementById('signUpModal').classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSignUpModal() {
+            document.getElementById('signUpModal').classList.add('hidden');
+            document.getElementById('signUpModal').classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+        function switchToSignUp() {
+            closeSignInModal();
+            openSignUpModal();
+        }
+        function switchToSignIn() {
+            closeSignUpModal();
+            openSignInModal();
+        }
+        document.addEventListener('click', function (event) {
+            const signInModal = document.getElementById('signInModal');
+            const signUpModal = document.getElementById('signUpModal');
+            if (event.target === signInModal) {
+                closeSignInModal();
+            }
+            if (event.target === signUpModal) {
+                closeSignUpModal();
+            }
+        });
+    </script>
+    <script id="form-handling-script">
+        function toggleCheckbox() {
+            const checkbox = document.getElementById('termsCheckbox');
+            const checkIcon = document.getElementById('checkIcon');
+            checkbox.checked = !checkbox.checked;
+            if (checkbox.checked) {
+                checkIcon.classList.remove('hidden');
+            } else {
+                checkIcon.classList.add('hidden');
+            }
+        }
+        function handleSignIn(event) {
+            event.preventDefault();
+            const username = event.target.querySelector('input[type="text"]').value;
+            const password = event.target.querySelector('input[type="password"]').value;
+            if (username && password) {
+                alert('Sign in functionality would be implemented here');
+                closeSignInModal();
+            }
+        }
+        function handleSignUp(event) {
+            event.preventDefault();
+            const username = event.target.querySelector('input[type="text"]').value;
+            const password = event.target.querySelector('input[type="password"]').value;
+            const termsCheckbox = document.getElementById('termsCheckbox');
+            if (!username || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            if (!termsCheckbox.checked) {
+                alert('Please agree to the Terms of Service');
+                return;
+            }
+            alert('Account created successfully! Welcome to Whispr.');
+            closeSignUpModal();
+        }
+    </script>
+    <script>
+        !function (t, e) { var o, n, p, r; e.__SV || (window.posthog = e, e._i = [], e.init = function (i, s, a) { function g(t, e) { var o = e.split("."); 2 == o.length && (t = t[o[0]], e = o[1]), t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } } (p = t.createElement("script")).type = "text/javascript", p.crossOrigin = "anonymous", p.async = !0, p.src = s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") + "/static/array.js", (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(p, r); var u = e; for (void 0 !== a ? u = e[a] = [] : a = "posthog", u.people = u.people || [], u.toString = function (t) { var e = "posthog"; return "posthog" !== a && (e += "." + a), t || (e += " (stub)"), e }, u.people.toString = function () { return u.toString(1) + ".people (stub)" }, o = "init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "), n = 0; n < o.length; n++)g(u, o[n]); e._i.push([i, s, a]) }, e.__SV = 1) }(document, window.posthog || []);
+        posthog.init('phc_t9tkQZJiyi2ps9zUYm8TDsL6qXo4YmZx0Ot5rBlAlEd', {
+            api_host: 'https://us.i.posthog.com',
+            autocapture: false,
+            capture_pageview: false,
+            capture_pageleave: false,
+            capture_performance: {
+                web_vitals: false,
+            },
+            rageclick: false,
+        })
+        window.shareKey = 'zkyNzjX7H2pQPFtCOKaeNQ';
+        window.host = 'readdy.ai';
+    </script>
+    
+    <script>
+    async function handleSignIn(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const username = form.querySelector('input[type="text"]').value;
+        const password = form.querySelector('input[type="password"]').value;
+
+        // Create FormData (since FastAPI expects form-encoded data)
+        const formData = new FormData();
+        formData.append("username", username);
+        formData.append("password", password);
+
+        try {
+            const response = await fetch("/login", {
+                method: "POST",
+                body: formData  // ✅ no need for headers, fetch sets it automatically
+            });
+
+            const result = await response.text();
+
+            if (result.trim() === "101") {
+                alert("❌ Username not found");
+            } else if (result.trim() === "102") {
+                alert("⚠️ Invalid password");
+            } else {
+                // Assume backend returned HTML template → replace current page
+                document.open();
+                document.write(result);
+                document.close();
+            }
+        } catch (err) {
+            console.error("Error:", err);
+            alert("Something went wrong. Please try again.");
+        }
+    }
+    </script>
+    <script>
+    async function handleSignUp(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const username = form.querySelector('input[name="username"]').value;
+        const password = form.querySelector('input[name="password"]').value;
+
+        // Build FormData for FastAPI
+        const formData = new FormData();
+        formData.append("username", username);
+        formData.append("password", password);
+
+        try {
+            const response = await fetch("/register", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.text();
+
+            if (result.trim() === "0") {
+                alert("⚠️ Account already exists");
+            }else {
+                // Assume backend returned HTML template → replace current page
+                document.open();
+                document.write(result);
+                document.close();
+            }
+        } catch (err) {
+            console.error("Error:", err);
+            alert("Something went wrong. Please try again.");
+        }
+    }
+    </script>
+
+</body>
+
+</html>
