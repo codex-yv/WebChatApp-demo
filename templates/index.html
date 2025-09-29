@@ -52,31 +52,13 @@
             background: rgba(0, 0, 0, 0.3);
             pointer-events: none;
         }
-
-        /* Mobile-first responsive adjustments */
-        @media (max-width: 768px) {
-            .mobile-header {
-                padding-top: 0.5rem !important;
-                padding-bottom: 0.5rem !important;
-            }
-            
-            .mobile-chat-header {
-                padding-top: 0.75rem !important;
-                padding-bottom: 0.75rem !important;
-            }
-
-            .mobile-input-area {
-                padding-top: 0.75rem !important;
-                padding-bottom: 0.75rem !important;
-            }
-        }
     </style>
 </head>
 
 <body class="bg-gray-900 h-screen overflow-hidden">
     <div class="flex flex-col h-screen">
-        <!-- Main Header - Much Thinner -->
-        <header class="bg-gray-800 text-white px-4 py-3 md:px-6 md:py-3 flex items-center justify-between border-b border-gray-700 mobile-header">
+        <!-- Main Header -->
+        <header class="bg-gray-800 text-white px-4 py-3 md:px-6 md:py-3 flex items-center justify-between border-b border-gray-700">
             <div class="flex items-center gap-3">
                 <div class="font-['Pacifico'] text-xl md:text-2xl text-primary">Whispr</div>
                 <div class="flex items-center gap-2 md:gap-3">
@@ -88,8 +70,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <button
-                    class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors">
+                <button class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors">
                     <i class="ri-notification-line text-sm md:text-lg"></i>
                 </button>
             </div>
@@ -102,14 +83,8 @@
                     <div class="flex items-center justify-between">
                         <h2 class="text-base md:text-lg font-semibold text-white">Chats</h2>
                         <div class="flex items-center gap-2">
-                            <button
-                                class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
-                                id="backToChat">
-                                <i class="ri-arrow-right-line text-gray-300 text-sm"></i>
-                            </button>
                             <div class="relative">
-                                <button
-                                    class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors"
+                                <button class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors"
                                     id="settingsBtn">
                                     <i class="ri-settings-line text-gray-300 text-sm md:text-base"></i>
                                 </button>
@@ -136,12 +111,11 @@
             </div>
 
             <!-- Chat Area -->
-            <div class="flex-1 flex flex-col bg-gray-900 h-full" id="chatArea">
-                <!-- Chat Header - Much Thinner -->
-                <div class="bg-gray-800 border-b border-gray-700 px-4 py-3 md:px-6 md:py-3 flex items-center gap-3 flex-shrink-0 mobile-chat-header"
+            <div class="flex-1 flex flex-col bg-gray-900 h-full hidden md:flex" id="chatArea">
+                <!-- Chat Header -->
+                <div class="bg-gray-800 border-b border-gray-700 px-4 py-3 md:px-6 md:py-3 flex items-center gap-3 flex-shrink-0"
                     id="chatHeader">
-                    <button
-                        class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
+                    <button class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
                         id="backToContacts">
                         <i class="ri-arrow-left-line text-gray-300 text-sm"></i>
                     </button>
@@ -154,10 +128,9 @@
                     </div>
                 </div>
 
-                <!-- Messages Area - Fixed height calculation -->
+                <!-- Messages Area -->
                 <div class="flex-1 overflow-y-auto p-3 md:p-6 chat-bg min-h-0" id="messagesArea">
                     <div class="space-y-3 md:space-y-4 relative z-10 min-h-full" id="messagesContainer">
-                        <!-- Messages will be dynamically rendered here -->
                         <div class="flex justify-center">
                             <div class="bg-gray-700 rounded-lg px-3 py-2 md:px-4 md:py-2">
                                 <p class="text-gray-400 text-xs md:text-sm">Select a contact to start chatting</p>
@@ -166,16 +139,14 @@
                     </div>
                 </div>
 
-                <!-- Input Area - Fixed for mobile visibility -->
-                <div class="border-t border-gray-700 p-3 bg-gray-800 flex-shrink-0 mobile-input-area">
+                <!-- Input Area -->
+                <div class="border-t border-gray-700 p-3 bg-gray-800 flex-shrink-0">
                     <div class="flex items-center gap-2">
                         <div class="flex-1 relative">
-                            <input
-                                class="w-full px-3 py-2 bg-gray-700 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
+                            <input class="w-full px-3 py-2 bg-gray-700 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
                                 id="messageInput" placeholder="Type a message..." type="text" />
                         </div>
-                        <button
-                            class="w-10 h-10 flex items-center justify-center bg-primary hover:bg-primary/90 text-black rounded-full transition-colors !rounded-button whitespace-nowrap flex-shrink-0"
+                        <button class="w-10 h-10 flex items-center justify-center bg-primary hover:bg-primary/90 text-black rounded-full transition-colors !rounded-button whitespace-nowrap flex-shrink-0"
                             id="sendBtn" onclick="sendMessage()">
                             <i class="ri-send-plane-fill text-base"></i>
                         </button>
@@ -262,14 +233,23 @@
 
         // Handle mobile layout
         function handleMobileLayout() {
-            if (window.innerWidth < 768) {
+            const isMobile = window.innerWidth < 768;
+            const sidebar = document.getElementById('sidebar');
+            const chatArea = document.getElementById('chatArea');
+            
+            if (isMobile) {
                 // On mobile, show contacts by default, hide chat
-                document.getElementById('sidebar').classList.remove('hidden');
-                document.getElementById('chatArea').classList.add('hidden');
+                if (!activeChatUser) {
+                    sidebar.classList.remove('hidden');
+                    chatArea.classList.add('hidden');
+                } else {
+                    sidebar.classList.add('hidden');
+                    chatArea.classList.remove('hidden');
+                }
             } else {
                 // On desktop, show both
-                document.getElementById('sidebar').classList.remove('hidden');
-                document.getElementById('chatArea').classList.remove('hidden');
+                sidebar.classList.remove('hidden');
+                chatArea.classList.remove('hidden');
             }
         }
 
@@ -295,29 +275,11 @@
                 });
             }
 
-            // Mobile navigation - FIXED: Proper event listeners
+            // Mobile navigation - SIMPLIFIED
             const backToContacts = document.getElementById('backToContacts');
-            const backToChat = document.getElementById('backToChat');
-            const sidebar = document.getElementById('sidebar');
-            const chatArea = document.getElementById('chatArea');
-
             if (backToContacts) {
-                backToContacts.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Back to contacts clicked');
-                    sidebar.classList.remove('hidden');
-                    chatArea.classList.add('hidden');
-                });
-            }
-
-            if (backToChat) {
-                backToChat.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Back to chat clicked');
-                    sidebar.classList.add('hidden');
-                    chatArea.classList.remove('hidden');
+                backToContacts.addEventListener('click', function () {
+                    showContactsView();
                 });
             }
 
@@ -329,44 +291,26 @@
                         sendMessage();
                     }
                 });
-
-                // Prevent input focus from triggering navigation
-                messageInput.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                });
-
-                messageInput.addEventListener('focus', function (e) {
-                    e.stopPropagation();
-                });
-            }
-
-            // Prevent chat area clicks from going back to contacts
-            const messagesArea = document.getElementById('messagesArea');
-            if (messagesArea) {
-                messagesArea.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                });
-            }
-
-            const messagesContainer = document.getElementById('messagesContainer');
-            if (messagesContainer) {
-                messagesContainer.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                });
-            }
-
-            const chatHeader = document.getElementById('chatHeader');
-            if (chatHeader) {
-                chatHeader.addEventListener('click', function (e) {
-                    // Only stop propagation if not clicking the back button
-                    if (!e.target.closest('#backToContacts')) {
-                        e.stopPropagation();
-                    }
-                });
             }
 
             // Responsive behavior
             window.addEventListener('resize', handleMobileLayout);
+        }
+
+        // Show contacts view (mobile only)
+        function showContactsView() {
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('chatArea').classList.add('hidden');
+            }
+        }
+
+        // Show chat view (mobile only)
+        function showChatView() {
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('chatArea').classList.remove('hidden');
+            }
         }
 
         // Render contacts list
@@ -402,13 +346,8 @@
                 contactEl.appendChild(avatar);
                 contactEl.appendChild(contactInfo);
 
-                // Contact click handler - FIXED: Proper navigation
-                contactEl.onclick = (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    console.log('Contact clicked:', contact);
-
+                // Contact click handler - SIMPLIFIED
+                contactEl.onclick = () => {
                     // Update active state
                     document.querySelectorAll('.contact-item').forEach(item => {
                         item.classList.remove('bg-primary/20', 'border-r-4', 'border-primary');
@@ -424,20 +363,14 @@
                     document.getElementById("messagesContainer").innerHTML = "";
                     loadChatHistory(currentUser, contact);
 
-                    // Mobile: switch to chat view
-                    if (window.innerWidth < 768) {
-                        console.log('Switching to chat view on mobile');
-                        document.getElementById('sidebar').classList.add('hidden');
-                        document.getElementById('chatArea').classList.remove('hidden');
-                        
-                        // Focus input for immediate typing
-                        setTimeout(() => {
-                            const messageInput = document.getElementById('messageInput');
-                            if (messageInput) {
-                                messageInput.focus();
-                            }
-                        }, 100);
-                    }
+                    // Switch to chat view on mobile
+                    showChatView();
+                    
+                    // Focus input for immediate typing
+                    setTimeout(() => {
+                        const messageInput = document.getElementById('messageInput');
+                        if (messageInput) messageInput.focus();
+                    }, 100);
                 };
 
                 contactsList.appendChild(contactEl);
