@@ -53,6 +53,11 @@
             pointer-events: none;
         }
 
+        /* Ensure proper mobile layout */
+        .mobile-safe-area {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
         /* Mobile-first responsive adjustments */
         @media (max-width: 768px) {
             .mobile-header {
@@ -61,6 +66,11 @@
             }
             
             .mobile-chat-header {
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+            }
+
+            .mobile-input-area {
                 padding-top: 0.75rem !important;
                 padding-bottom: 0.75rem !important;
             }
@@ -157,7 +167,7 @@
                     </div>
                 </div>
 
-                <!-- Messages Area -->
+                <!-- Messages Area - Fixed height calculation -->
                 <div class="flex-1 overflow-y-auto p-3 md:p-6 chat-bg min-h-0" id="messagesArea">
                     <div class="space-y-3 md:space-y-4 relative z-10 min-h-full" id="messagesContainer">
                         <!-- Messages will be dynamically rendered here -->
@@ -169,18 +179,18 @@
                     </div>
                 </div>
 
-                <!-- Input Area -->
-                <div class="border-t border-gray-700 p-3 md:p-4 bg-gray-800 flex-shrink-0">
-                    <div class="flex items-center gap-2 md:gap-3">
+                <!-- Input Area - Fixed for mobile visibility -->
+                <div class="border-t border-gray-700 p-3 bg-gray-800 flex-shrink-0 mobile-input-area mobile-safe-area">
+                    <div class="flex items-center gap-2">
                         <div class="flex-1 relative">
                             <input
-                                class="w-full px-3 py-2 md:px-4 md:py-2 bg-gray-700 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs md:text-sm"
+                                class="w-full px-3 py-2 bg-gray-700 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
                                 id="messageInput" placeholder="Type a message..." type="text" />
                         </div>
                         <button
-                            class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-primary hover:bg-primary/90 text-black rounded-full transition-colors !rounded-button whitespace-nowrap"
+                            class="w-10 h-10 flex items-center justify-center bg-primary hover:bg-primary/90 text-black rounded-full transition-colors !rounded-button whitespace-nowrap flex-shrink-0"
                             id="sendBtn" onclick="sendMessage()">
-                            <i class="ri-send-plane-fill text-sm md:text-base"></i>
+                            <i class="ri-send-plane-fill text-base"></i>
                         </button>
                     </div>
                 </div>
@@ -261,7 +271,25 @@
 
             // Set initial mobile state
             handleMobileLayout();
+
+            // Ensure input area is visible on mobile
+            ensureMobileInputVisibility();
         };
+
+        // Ensure mobile input visibility
+        function ensureMobileInputVisibility() {
+            if (window.innerWidth < 768) {
+                const chatArea = document.getElementById('chatArea');
+                const inputArea = chatArea?.querySelector('.mobile-input-area');
+                
+                if (inputArea) {
+                    // Force input area to be visible and properly positioned
+                    inputArea.style.position = 'relative';
+                    inputArea.style.zIndex = '50';
+                    inputArea.style.backgroundColor = '#1f2937'; // bg-gray-800
+                }
+            }
+        }
 
         // Handle mobile layout
         function handleMobileLayout() {
@@ -315,6 +343,8 @@
                 backToChat.addEventListener('click', function () {
                     sidebar.classList.add('hidden');
                     chatArea.classList.remove('hidden');
+                    // Ensure input is visible when switching to chat
+                    setTimeout(ensureMobileInputVisibility, 100);
                 });
             }
 
@@ -326,10 +356,30 @@
                         sendMessage();
                     }
                 });
+
+                // Focus input when chat area becomes visible on mobile
+                messageInput.addEventListener('focus', function() {
+                    // Scroll to bottom to ensure input is visible when keyboard opens
+                    setTimeout(() => {
+                        const messagesArea = document.getElementById('messagesArea');
+                        if (messagesArea) {
+                            messagesArea.scrollTop = messagesArea.scrollHeight;
+                        }
+                    }, 300);
+                });
             }
 
             // Responsive behavior
-            window.addEventListener('resize', handleMobileLayout);
+            window.addEventListener('resize', function() {
+                handleMobileLayout();
+                ensureMobileInputVisibility();
+            });
+
+            // Handle virtual keyboard on mobile
+            window.addEventListener('resize', function() {
+                // This helps when virtual keyboard appears/disappears
+                setTimeout(ensureMobileInputVisibility, 100);
+            });
         }
 
         // Render contacts list
@@ -386,6 +436,13 @@
                     if (window.innerWidth < 768) {
                         document.getElementById('sidebar').classList.add('hidden');
                         document.getElementById('chatArea').classList.remove('hidden');
+                        // Ensure input is visible after switching
+                        setTimeout(ensureMobileInputVisibility, 100);
+                        // Focus input for immediate typing
+                        setTimeout(() => {
+                            const messageInput = document.getElementById('messageInput');
+                            if (messageInput) messageInput.focus();
+                        }, 200);
                     }
                 };
 
@@ -470,6 +527,9 @@
                 ws.send(JSON.stringify({ to: activeChatUser, msg }));
                 appendMessage(currentUser, msg);
                 msgInput.value = "";
+                
+                // Keep focus on input for continuous typing
+                msgInput.focus();
             } else {
                 alert("WebSocket is not connected.");
             }
