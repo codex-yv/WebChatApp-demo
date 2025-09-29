@@ -78,7 +78,10 @@ async def websocket_endpoint(user_id: str, websocket: WebSocket):
             # Send to recipient only
             # print(message)
             if recipient in connected_users:
-                await connected_users[recipient].send_text(f"{user_id}: {message}")
+                try:
+                    await connected_users[recipient].send_text(f"{user_id}: {message}")
+                except RuntimeError:
+                    pass
             else:
                 await insert_chat(collection_name=contact_key, user = user_id, message = message)
 
@@ -86,9 +89,9 @@ async def websocket_endpoint(user_id: str, websocket: WebSocket):
         # print(f"{user_id} disconnected")
         try:
             await connected_users[recipient].send_text(f"{user_id}: DISCONNECTED")
+            await insert_chat(collection_name=contact_key, user = user_id, message = "DISCONNECTED")
         except (KeyError, UnboundLocalError): # add unboundlocal error too
             pass
-        await insert_chat(collection_name=contact_key, user = user_id, message = "DISCONNECTED")
         try:
             del connected_users[user_id]
         except KeyError:

@@ -1,418 +1,581 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Community Chat</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Chat Application</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00D4AA',
+                        secondary: '#1A1A1A'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '8px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '8px'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chat-bg {
+            background-color: #1a1a1a;
+            background-image: url('https://readdy.ai/api/search-image?query=dark%20abstract%20technology%20background%20with%20subtle%20circuit%20patterns%20and%20glowing%20lines%2C%20deep%20navy%20blue%20and%20dark%20gray%20gradient%2C%20modern%20digital%20communication%20theme%2C%20minimal%20geometric%20shapes%2C%20professional%20dark%20interface%20design%20suitable%20for%20messaging%20app&width=1400&height=900&seq=chatbg004&orientation=landscape');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .chat-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
+        @font-face {
+          font-family: 'Pacifico';
+          font-style: normal;
+          font-weight: 400;
+          font-display: swap;
+          src: url(https://fonts.gstatic.com/s/pacifico/v23/FwZY7-Qmy14u9lezJ96A.ttf) format('truetype');
+        }
+
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex justify-center items-center">
-  <div class="w-full max-w-5xl bg-white rounded-xl shadow-lg flex h-[90vh]">
 
-    <!-- LEFT: CONTACTS -->
-    <div class="w-1/3 border-r flex flex-col">
-      <!-- Header with single profile icon (current user) -->
-      <div class="px-4 py-3 border-b flex items-center justify-between">
-        <!-- Left side: User Avatar + Contacts text -->
-        <div class="flex items-center gap-3">
-          <div id="userAvatar"
-              class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold cursor-pointer"
-              title="Click to set Unique Key"
-              onclick="openModal()"></div>
-          <h2 class="text-lg font-semibold">Contacts</h2>
+<body class="bg-gray-900 h-screen overflow-hidden">
+    <div class="flex flex-col h-screen">
+        <header class="bg-gray-800 text-white px-6 py-4 flex items-center justify-between border-b border-gray-700">
+            <div class="flex items-center gap-4">
+                <div class="font-['Pacifico'] text-2xl text-primary">Whispr</div>
+                <div class="flex items-center gap-3 ml-6">
+                    <div class="w-10 h-10 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold cursor-pointer"
+                         onclick="openUniqueKeyModal()">
+                        <i class="ri-user-line text-gray-300"></i>
+                    </div>
+                    <span class="text-lg font-medium" id="username">{{ user }}</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button
+                    class="w-8 h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors">
+                    <i class="ri-notification-line text-lg"></i>
+                </button>
+            </div>
+        </header>
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar - Contacts List -->
+            <div class="w-full md:w-80 bg-gray-800 border-r border-gray-700 flex flex-col md:block hidden" id="sidebar">
+                <div class="p-4 border-b border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-white">Chats</h2>
+                        <div class="flex items-center gap-2">
+                            <button
+                                class="w-8 h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
+                                id="backToChat">
+                                <i class="ri-arrow-right-line text-gray-300"></i>
+                            </button>
+                            <div class="relative">
+                                <button
+                                    class="w-8 h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors"
+                                    id="settingsBtn">
+                                    <i class="ri-settings-line text-gray-300"></i>
+                                </button>
+                                <div class="absolute right-0 top-10 bg-gray-700 border border-gray-600 rounded-lg shadow-lg py-2 w-48 hidden z-10"
+                                    id="settingsMenu">
+                                    <button onclick="openAddUserModal()"
+                                        class="w-full px-4 py-2 text-left hover:bg-gray-600 flex items-center gap-3 text-white">
+                                        <i class="ri-user-add-line text-gray-300"></i>
+                                        Add new user
+                                    </button>
+                                    <button onclick="showNotifications()"
+                                        class="w-full px-4 py-2 text-left hover:bg-gray-600 flex items-center gap-3 text-white">
+                                        <i class="ri-notification-line text-gray-300"></i>
+                                        Notifications
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-y-auto" id="contactsList">
+                    <!-- Contacts will be dynamically rendered here -->
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="flex-1 flex flex-col bg-gray-900 h-full" id="chatArea">
+                <div class="bg-gray-800 border-b border-gray-700 px-4 md:px-6 py-4 flex items-center gap-3 flex-shrink-0"
+                    id="chatHeader">
+                    <button
+                        class="w-8 h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
+                        id="backToContacts">
+                        <i class="ri-arrow-left-line text-gray-300"></i>
+                    </button>
+                    <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center" id="chatContactImage">
+                        <i class="ri-user-line text-gray-300"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-medium text-white" id="chatContactName">Select a contact</h3>
+                        <p class="text-sm text-gray-400" id="chatStatus">Offline</p>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 md:p-6 chat-bg min-h-0" id="messagesArea">
+                    <div class="space-y-4 relative z-10 min-h-full" id="messagesContainer">
+                        <!-- Messages will be dynamically rendered here -->
+                        <div class="flex justify-center">
+                            <div class="bg-gray-700 rounded-lg px-4 py-2">
+                                <p class="text-gray-400 text-sm">Select a contact to start chatting</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-gray-700 p-3 md:p-4 bg-gray-800 flex-shrink-0">
+                    <div class="flex items-center gap-2 md:gap-3">
+                        <div class="flex-1 relative">
+                            <input
+                                class="w-full px-4 py-2 bg-gray-700 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
+                                id="messageInput" placeholder="Type a message..." type="text" />
+                        </div>
+                        <button
+                            class="w-10 h-10 flex items-center justify-center bg-primary hover:bg-primary/90 text-black rounded-full transition-colors !rounded-button whitespace-nowrap"
+                            id="sendBtn" onclick="sendMessage()">
+                            <i class="ri-send-plane-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <!-- Right side: Menu button -->
-        <div class="relative">
-          <button id="menuBtn"
-                  class="p-2 rounded-full hover:bg-gray-100 focus:outline-none"
-                  onclick="toggleMenu()">
-            ⋮
-          </button>
-          <!-- Dropdown Menu -->
-          <div id="menuDropdown"
-              class="hidden absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg z-10">
-            <button onclick="addNewUser()"
-                    class="block w-full text-left px-4 py-2 hover:bg-gray-100">
-              Add new user
-            </button>
-            <button onclick="showNotifications()"
-                    class="block w-full text-left px-4 py-2 hover:bg-gray-100">
-              Notification
-            </button>
-          </div>
+    <!-- Hidden data injected by FastAPI -->
+    <script id="contacts-data" type="application/json">{{ contacts | tojson }}</script>
+
+    <!-- Unique Key Modal -->
+    <div id="uniqueKeyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg shadow-lg w-96 p-6 border border-gray-700">
+            <h2 class="text-lg font-semibold text-white mb-4">Enter your Unique Key</h2>
+            <input id="uniqueKeyInput" type="text" placeholder="Unique Key"
+                   class="w-full border border-gray-600 bg-gray-700 text-white px-3 py-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-primary" />
+            <div class="flex justify-end gap-2">
+                <button onclick="closeUniqueKeyModal()" class="px-4 py-2 rounded bg-gray-600 text-white hover:bg-gray-700 transition-colors">Cancel</button>
+                <button onclick="saveUniqueKey()" class="px-4 py-2 rounded bg-primary text-black hover:bg-primary/90 transition-colors">Save</button>
+            </div>
+            <p id="modalMessage" class="text-sm mt-3"></p>
         </div>
-      </div>
-
-      <!-- Contacts list -->
-      <div id="contacts" class="flex-1 overflow-y-auto"></div>
     </div>
 
-    <!-- RIGHT: CHAT -->
-    <div class="flex-1 flex flex-col">
-      <!-- Chat Header -->
-      <div class="px-4 py-3 border-b flex items-center gap-2">
-        <h2 id="chat-with" class="text-lg font-semibold text-gray-700">Select a contact</h2>
-      </div>
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96 border border-gray-700">
+            <h2 class="text-xl font-semibold text-white mb-4">Add New User</h2>
 
-      <!-- Messages -->
-      <div id="output" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50"></div>
+            <label class="block mb-2 text-sm font-medium text-gray-300">Username</label>
+            <input id="newUsername" type="text"
+                  class="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Enter username">
 
-      <!-- Input -->
-      <div class="p-3 border-t flex items-center gap-2">
-        <input id="messageInput" type="text" placeholder="Type a message..."
-               class="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
-        <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full">➤</button>
-      </div>
+            <label class="block mb-2 text-sm font-medium text-gray-300">Key</label>
+            <input id="newUserKey" type="text"
+                  class="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Enter key">
+
+            <div id="addUserMessage" class="text-sm mb-3"></div>
+
+            <div class="flex justify-end gap-3">
+                <button onclick="closeAddUserModal()"
+                        class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors">Cancel</button>
+                <button onclick="connectUser()"
+                        class="px-4 py-2 bg-primary text-black rounded hover:bg-primary/90 transition-colors">Connect</button>
+            </div>
+        </div>
     </div>
-  </div>
-  <!-- Add New User Modal -->
-  <div id="addUserModal"
-      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-      <h2 class="text-xl font-semibold mb-4">Add New User</h2>
 
-      <label class="block mb-2 text-sm font-medium">Username</label>
-      <input id="newUsername" type="text"
-            class="w-full px-3 py-2 border rounded mb-4"
-            placeholder="Enter username">
+    <script>
+        let ws;
+        let currentUser;
+        let activeChatUser = null;
+        let contacts = [];
 
-      <label class="block mb-2 text-sm font-medium">Key</label>
-      <input id="newUserKey" type="text"
-            class="w-full px-3 py-2 border rounded mb-4"
-            placeholder="Enter key">
+        // Initialize application
+        window.onload = () => {
+            currentUser = "{{ user }}".trim();
+            if (!currentUser) {
+                alert("No user found.");
+                return;
+            }
 
-      <div id="addUserMessage" class="text-sm mb-3"></div>
+            // Update username in header
+            document.getElementById("username").textContent = currentUser;
 
-      <div class="flex justify-end gap-3">
-        <button onclick="closeAddUserModal()"
-                class="px-4 py-2 bg-gray-300 rounded">Cancel</button>
-        <button onclick="connectUser()"
-                class="px-4 py-2 bg-blue-600 text-white rounded">Connect</button>
-      </div>
-    </div>
-  </div>
-  <!-- Hidden user and contacts data injected by FastAPI/Jinja -->
-  <h2 id="username" class="hidden">{{ user }}</h2>
-  <script id="contacts-data" type="application/json">{{ contacts | tojson }}</script>
+            // Load contacts
+            const contactsData = JSON.parse(document.getElementById("contacts-data").textContent || "[]");
+            contacts = contactsData;
+            renderContacts(contacts);
 
-  <!-- MODAL for Unique Key (opens only on avatar click) -->
-  <div id="uniqueKeyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-    <div class="bg-white rounded-lg shadow-lg w-96 p-6">
-      <h2 class="text-lg font-semibold mb-4">Enter your Unique Key</h2>
-      <input id="uniqueKeyInput" type="text" placeholder="Unique Key"
-             class="w-full border px-3 py-2 rounded mb-4 focus:outline-none focus:ring focus:ring-blue-300" />
-      <div class="flex justify-end gap-2">
-        <button onclick="closeModal()" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancel</button>
-        <button onclick="saveUniqueKey()" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">Save</button>
-      </div>
-      <p id="modalMessage" class="text-sm mt-3"></p>
-    </div>
-  </div>
+            // Connect WebSocket
+            connect(currentUser);
 
-  <script>
-    let ws;
-    let currentUser;
-    let activeChatUser = null;
-
-    window.onload = () => {
-      currentUser = document.getElementById("username").innerText.trim();
-      if (!currentUser) {
-        alert("No user found.");
-        return;
-      }
-
-      // Set avatar initial in header (single avatar)
-      const avatarEl = document.getElementById("userAvatar");
-      avatarEl.innerText = currentUser.charAt(0).toUpperCase();
-
-      // Render contacts list
-      const contactsData = JSON.parse(document.getElementById("contacts-data").textContent || "[]");
-      renderContacts(contactsData);
-
-      // Connect websocket
-      connect(currentUser);
-    };
-
-    // Render contact rows (no modal on contact click)
-    function renderContacts(contacts) {
-      const contactsDiv = document.getElementById("contacts");
-      contactsDiv.innerHTML = "";
-
-      contacts.forEach(contact => {
-        const contactEl = document.createElement("div");
-        contactEl.className =
-          "px-4 py-3 hover:bg-gray-100 cursor-pointer border-b flex items-center gap-3";
-
-        // small avatar/initial for list preview
-        const avatar = document.createElement("div");
-        avatar.className = "w-8 h-8 rounded-full bg-gray-400 text-white flex items-center justify-center font-bold";
-        avatar.innerText = contact.charAt(0).toUpperCase();
-
-        const name = document.createElement("span");
-        name.className = "font-medium";
-        name.innerText = contact;
-
-        contactEl.appendChild(avatar);
-        contactEl.appendChild(name);
-
-        // When a contact is clicked: set active, update header, clear chat, POST for history
-        contactEl.onclick = () => {
-          activeChatUser = contact;
-          document.getElementById("chat-with").innerText = contact;
-          document.getElementById("output").innerHTML = "";
-          loadChatHistory(currentUser, contact); // POST request (your original style)
+            // Initialize UI interactions
+            initializeUI();
         };
 
-        contactsDiv.appendChild(contactEl);
-      });
-    }
+        // Initialize UI event listeners
+        function initializeUI() {
+            // Settings menu
+            const settingsBtn = document.getElementById('settingsBtn');
+            const settingsMenu = document.getElementById('settingsMenu');
+            settingsBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                settingsMenu.classList.toggle('hidden');
+            });
+            document.addEventListener('click', function () {
+                settingsMenu.classList.add('hidden');
+            });
+            settingsMenu.addEventListener('click', function (e) {
+                e.stopPropagation();
+            });
 
-    // POST /chat-history with { user, contact } (original style you used)
-    async function loadChatHistory(user, contact) {
-      try {
-        const response = await fetch("/chat-history", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user: user, contact: contact })
-        });
+            // Mobile navigation
+            const backToContacts = document.getElementById('backToContacts');
+            const backToChat = document.getElementById('backToChat');
+            const sidebar = document.getElementById('sidebar');
+            const chatArea = document.getElementById('chatArea');
 
-        if (response.ok) {
-          const history = await response.json(); // expected: [(username, msg), ...]
-          renderChatHistory(history);
-        } else {
-          console.error("Failed to load chat history:", response.status, await response.text());
+            backToContacts.addEventListener('click', function () {
+                sidebar.classList.remove('hidden');
+                chatArea.classList.add('hidden');
+            });
+
+            backToChat.addEventListener('click', function () {
+                sidebar.classList.add('hidden');
+                chatArea.classList.remove('hidden');
+            });
+
+            // Message input enter key
+            const messageInput = document.getElementById('messageInput');
+            messageInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Responsive behavior
+            window.addEventListener('resize', function () {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('hidden');
+                    chatArea.classList.remove('hidden');
+                }
+            });
         }
-      } catch (err) {
-        console.error("Error fetching chat history:", err);
-      }
-    }
 
-    // Render history into chat window
-    function renderChatHistory(history) {
-      const output = document.getElementById("output");
-      output.innerHTML = "";
+        // Render contacts list
+        function renderContacts(contacts) {
+            const contactsList = document.getElementById("contactsList");
+            contactsList.innerHTML = "";
 
-      // history expected as array of [sender, message]
-      history.forEach(pair => {
-        // defensive destructuring in case server returns arrays vs tuples
-        const sender = pair[0];
-        const message = pair[1];
-        appendMessage(sender, message);
-      });
+            contacts.forEach(contact => {
+                const contactEl = document.createElement("div");
+                contactEl.className = "contact-item hover:bg-gray-700 px-4 py-3 cursor-pointer flex items-center gap-3 border-b border-gray-700";
+                contactEl.setAttribute("data-contact", contact);
 
-      output.scrollTop = output.scrollHeight;
-    }
+                const avatar = document.createElement("div");
+                avatar.className = "w-12 h-12 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold";
+                avatar.innerHTML = `<i class="ri-user-line text-gray-300"></i>`;
 
-    // Modal functions (ONLY avatar opens modal)
-    function openModal() {
-      document.getElementById("uniqueKeyModal").classList.remove("hidden");
-      document.getElementById("uniqueKeyInput").value = "";
-      document.getElementById("modalMessage").innerText = "";
-    }
-    function closeModal() {
-      document.getElementById("uniqueKeyModal").classList.add("hidden");
-    }
+                const contactInfo = document.createElement("div");
+                contactInfo.className = "flex-1 min-w-0";
+                
+                const name = document.createElement("h3");
+                name.className = "font-medium text-white truncate";
+                name.textContent = contact;
 
-    // Save unique key for current user (POST to /save-unique-id)
-    async function saveUniqueKey() {
-      const uniqueId = document.getElementById("uniqueKeyInput").value.trim();
-      const messageEl = document.getElementById("modalMessage");
+                const lastMessage = document.createElement("p");
+                lastMessage.className = "text-sm text-gray-400 truncate";
+                lastMessage.textContent = "Click to start chatting";
 
-      if (!uniqueId) {
-        messageEl.innerText = "Unique Key is required!";
-        messageEl.className = "text-sm text-red-600 mt-3";
-        return;
-      }
+                contactInfo.appendChild(name);
+                contactInfo.appendChild(lastMessage);
 
-      try {
-        const res = await fetch("/save-unique-id", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user: currentUser, unique_id: uniqueId })
-        });
+                contactEl.appendChild(avatar);
+                contactEl.appendChild(contactInfo);
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success) {
-            messageEl.innerText = "Changes have been saved.";
-            messageEl.className = "text-sm text-green-600 mt-3";
-            setTimeout(() => closeModal(), 900);
-          } else {
-            messageEl.innerText = "ID already exists.";
-            messageEl.className = "text-sm text-red-600 mt-3";
-          }
-        } else {
-          messageEl.innerText = "Server error.";
-          messageEl.className = "text-sm text-red-600 mt-3";
-          console.error("save-unique-id failed:", res.status, await res.text());
+                // Contact click handler
+                contactEl.onclick = () => {
+                    // Update active state
+                    document.querySelectorAll('.contact-item').forEach(item => {
+                        item.classList.remove('bg-primary/20', 'border-r-4', 'border-primary');
+                    });
+                    contactEl.classList.add('bg-primary/20', 'border-r-4', 'border-primary');
+
+                    // Set active chat
+                    activeChatUser = contact;
+                    document.getElementById("chatContactName").textContent = contact;
+                    document.getElementById("chatStatus").textContent = "Online";
+                    
+                    // Clear and load chat history
+                    document.getElementById("messagesContainer").innerHTML = "";
+                    loadChatHistory(currentUser, contact);
+
+                    // Mobile: switch to chat view
+                    if (window.innerWidth < 768) {
+                        document.getElementById('sidebar').classList.add('hidden');
+                        document.getElementById('chatArea').classList.remove('hidden');
+                    }
+                };
+
+                contactsList.appendChild(contactEl);
+            });
         }
-      } catch (err) {
-        messageEl.innerText = "Error saving unique key.";
-        messageEl.className = "text-sm text-red-600 mt-3";
-        console.error("saveUniqueKey error:", err);
-      }
-    }
 
-    // WebSocket connect
-    function connect(userId) {
-      try {
-        const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-        const wsUrl = `${protocol}://${window.location.host}/ws/${userId}`;
-        ws = new WebSocket(wsUrl);
+        // Load chat history
+        async function loadChatHistory(user, contact) {
+            try {
+                const response = await fetch("/chat-history", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user: user, contact: contact })
+                });
 
-        ws.onopen = () => console.log("WebSocket connected:", wsUrl);
-        ws.onmessage = (event) => {
-          // server sends "sender: message"
-          const [sender, ...messageParts] = event.data.split(":");
-          const messageText = messageParts.join(":").trim();
-
-          // Append only if relevant to current open chat OR it's the current user (so you still see your sent messages)
-          // If you prefer to always append broadcasts, remove the if-check below.
-          const senderTrim = sender.trim();
-          if (senderTrim === currentUser || senderTrim === activeChatUser) {
-            appendMessage(senderTrim, messageText);
-          }
-        };
-        ws.onerror = (e) => console.error("WebSocket error:", e);
-        ws.onclose = () => console.log("WebSocket closed");
-      } catch (err) {
-        console.error("WS connect error:", err);
-      }
-    }
-
-    // Send message via WebSocket (same behaviour as before)
-    function sendMessage() {
-      const msgInput = document.getElementById("messageInput");
-      const msg = msgInput.value.trim();
-      if (!msg) return alert("Type a message.");
-      if (!activeChatUser) return alert("Please select a contact first.");
-
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ to: activeChatUser, msg })); // backend expects raw message text
-        appendMessage(currentUser, msg);
-        msgInput.value = "";
-      } else {
-        alert("WebSocket is not connected.");
-      }
-    }
-
-    // Append message into chat window with correct alignment/colors
-    function appendMessage(sender, messageText) {
-      const output = document.getElementById("output");
-      const wrapper = document.createElement("div");
-
-      if (sender === currentUser) {
-        wrapper.className = "flex justify-end mb-2";
-      } else {
-        wrapper.className = "flex justify-start mb-2";
-      }
-
-      const bubble = document.createElement("div");
-      bubble.className = sender === currentUser
-        ? "bg-blue-600 text-white px-4 py-2 rounded-2xl max-w-sm"
-        : "bg-gray-200 text-gray-800 px-4 py-2 rounded-2xl max-w-sm";
-
-      // optionally hide sender label for self messages if you like
-      bubble.innerHTML = `
-        <p class="text-xs font-semibold mb-1">${sender}</p>
-        <p>${escapeHtml(messageText)}</p>
-      `;
-
-      wrapper.appendChild(bubble);
-      output.appendChild(wrapper);
-      output.scrollTop = output.scrollHeight;
-    }
-
-    // small helper to avoid raw HTML injection
-    function escapeHtml(unsafe) {
-      return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function toggleMenu() {
-      const dropdown = document.getElementById("menuDropdown");
-      dropdown.classList.toggle("hidden");
-    }
-
-    // Example handlers
-    function addNewUser() {
-      openAddUserModal();
-      toggleMenu();
-    }
-
-    function showNotifications() {
-      alert("Notification clicked!");
-      toggleMenu();
-    }
-
-    // Close menu if clicked outside
-    window.addEventListener("click", function (e) {
-      const menuBtn = document.getElementById("menuBtn");
-      const dropdown = document.getElementById("menuDropdown");
-      if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.add("hidden");
-      }
-    });
-
-    function openAddUserModal() {
-      document.getElementById("addUserModal").classList.remove("hidden");
-    }
-
-    function closeAddUserModal() {
-      document.getElementById("addUserModal").classList.add("hidden");
-      document.getElementById("addUserMessage").innerText = "";
-    }
-
-    async function connectUser() {
-      const username = document.getElementById("newUsername").value.trim();
-      const key = document.getElementById("newUserKey").value.trim();
-      const messageEl = document.getElementById("addUserMessage");
-
-      if (!username || !key) {
-        messageEl.innerText = "Both fields are required.";
-        messageEl.className = "text-sm text-red-600 mb-3";
-        return;
-      }
-
-      try {
-        const res = await fetch("/connect-user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, key })
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-
-          if (Array.isArray(data)) {
-            // ✅ Server returned updated contacts list
-            updateContactList(data);
-            closeAddUserModal();
-          } else {
-            // ❌ Server returned False
-            document.getElementById("addUserMessage").innerText =
-              "Given data doesn't match any users.";
-            document.getElementById("addUserMessage").className =
-              "text-sm text-red-600 mt-3";
-          }
-        } else {
-          messageEl.innerText = "Server error.";
-          messageEl.className = "text-sm text-red-600 mb-3";
+                if (response.ok) {
+                    const history = await response.json();
+                    renderChatHistory(history);
+                } else {
+                    console.error("Failed to load chat history:", response.status, await response.text());
+                }
+            } catch (err) {
+                console.error("Error fetching chat history:", err);
+            }
         }
-      } catch (err) {
-        console.error("connectUser error:", err);
-        messageEl.innerText = "Error connecting user.";
-        messageEl.className = "text-sm text-red-600 mb-3";
-      }
-    }
 
-    function updateContactList(contacts) {
-      renderContacts(contacts);
-    }
-  </script>
+        // Render chat history
+        function renderChatHistory(history) {
+            const messagesContainer = document.getElementById("messagesContainer");
+            messagesContainer.innerHTML = "";
+
+            history.forEach(pair => {
+                const sender = pair[0];
+                const message = pair[1];
+                appendMessage(sender, message);
+            });
+
+            // Scroll to bottom
+            const messagesArea = document.getElementById("messagesArea");
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        // WebSocket connection
+        function connect(userId) {
+            try {
+                const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+                const wsUrl = `${protocol}://${window.location.host}/ws/${userId}`;
+                ws = new WebSocket(wsUrl);
+
+                ws.onopen = () => console.log("WebSocket connected:", wsUrl);
+                ws.onmessage = (event) => {
+                    const [sender, ...messageParts] = event.data.split(":");
+                    const messageText = messageParts.join(":").trim();
+                    const senderTrim = sender.trim();
+                    
+                    if (senderTrim === currentUser || senderTrim === activeChatUser) {
+                        appendMessage(senderTrim, messageText);
+                    }
+                };
+                ws.onerror = (e) => console.error("WebSocket error:", e);
+                ws.onclose = () => console.log("WebSocket closed");
+            } catch (err) {
+                console.error("WS connect error:", err);
+            }
+        }
+
+        // Send message
+        function sendMessage() {
+            const msgInput = document.getElementById("messageInput");
+            const msg = msgInput.value.trim();
+            if (!msg) return;
+            if (!activeChatUser) return alert("Please select a contact first.");
+
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ to: activeChatUser, msg }));
+                appendMessage(currentUser, msg);
+                msgInput.value = "";
+            } else {
+                alert("WebSocket is not connected.");
+            }
+        }
+
+        // Append message to chat
+        function appendMessage(sender, messageText) {
+            const messagesContainer = document.getElementById("messagesContainer");
+            const wrapper = document.createElement("div");
+
+            if (sender === currentUser) {
+                wrapper.className = "flex justify-end";
+            } else {
+                wrapper.className = "flex justify-start";
+            }
+
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            const bubble = document.createElement("div");
+            bubble.className = sender === currentUser
+                ? "max-w-xs bg-primary text-black rounded-lg px-4 py-2"
+                : "max-w-xs bg-gray-700 text-white rounded-lg px-4 py-2 shadow-sm";
+
+            bubble.innerHTML = `
+                <p class="text-xs font-semibold mb-1 ${sender === currentUser ? 'text-gray-800' : 'text-gray-300'}">${sender}</p>
+                <p>${escapeHtml(messageText)}</p>
+                <span class="text-xs ${sender === currentUser ? 'text-gray-800' : 'text-gray-400'} mt-1 block">${timeString}</span>
+            `;
+
+            wrapper.appendChild(bubble);
+            messagesContainer.appendChild(wrapper);
+
+            // Scroll to bottom
+            const messagesArea = document.getElementById("messagesArea");
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        // Unique Key Modal functions
+        function openUniqueKeyModal() {
+            document.getElementById("uniqueKeyModal").classList.remove("hidden");
+            document.getElementById("uniqueKeyInput").value = "";
+            document.getElementById("modalMessage").textContent = "";
+        }
+
+        function closeUniqueKeyModal() {
+            document.getElementById("uniqueKeyModal").classList.add("hidden");
+        }
+
+        async function saveUniqueKey() {
+            const uniqueId = document.getElementById("uniqueKeyInput").value.trim();
+            const messageEl = document.getElementById("modalMessage");
+
+            if (!uniqueId) {
+                messageEl.textContent = "Unique Key is required!";
+                messageEl.className = "text-red-400";
+                return;
+            }
+
+            try {
+                const res = await fetch("/save-unique-id", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user: currentUser, unique_id: uniqueId })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success) {
+                        messageEl.textContent = "Changes have been saved.";
+                        messageEl.className = "text-green-400";
+                        setTimeout(() => closeUniqueKeyModal(), 900);
+                    } else {
+                        messageEl.textContent = "ID already exists.";
+                        messageEl.className = "text-red-400";
+                    }
+                } else {
+                    messageEl.textContent = "Server error.";
+                    messageEl.className = "text-red-400";
+                }
+            } catch (err) {
+                messageEl.textContent = "Error saving unique key.";
+                messageEl.className = "text-red-400";
+                console.error("saveUniqueKey error:", err);
+            }
+        }
+
+        // Add User Modal functions
+        function openAddUserModal() {
+            document.getElementById("addUserModal").classList.remove("hidden");
+            document.getElementById("addUserMessage").textContent = "";
+        }
+
+        function closeAddUserModal() {
+            document.getElementById("addUserModal").classList.add("hidden");
+        }
+
+        async function connectUser() {
+            const username = document.getElementById("newUsername").value.trim();
+            const key = document.getElementById("newUserKey").value.trim();
+            const messageEl = document.getElementById("addUserMessage");
+
+            if (!username || !key) {
+                messageEl.textContent = "Both fields are required.";
+                messageEl.className = "text-red-400";
+                return;
+            }
+
+            try {
+                const res = await fetch("/connect-user", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, key })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data)) {
+                        contacts = data;
+                        updateContactList(data);
+                        closeAddUserModal();
+                    } else {
+                        messageEl.textContent = "Given data doesn't match any users.";
+                        messageEl.className = "text-red-400";
+                    }
+                } else {
+                    messageEl.textContent = "Server error.";
+                    messageEl.className = "text-red-400";
+                }
+            } catch (err) {
+                console.error("connectUser error:", err);
+                messageEl.textContent = "Error connecting user.";
+                messageEl.className = "text-red-400";
+            }
+        }
+
+        function updateContactList(contacts) {
+            renderContacts(contacts);
+        }
+
+        function showNotifications() {
+            alert("Notification feature coming soon!");
+        }
+
+        // Utility function
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
 </body>
 </html>
