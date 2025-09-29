@@ -52,65 +52,72 @@
             background: rgba(0, 0, 0, 0.3);
             pointer-events: none;
         }
-        @font-face {
-          font-family: 'Pacifico';
-          font-style: normal;
-          font-weight: 400;
-          font-display: swap;
-          src: url(https://fonts.gstatic.com/s/pacifico/v23/FwZY7-Qmy14u9lezJ96A.ttf) format('truetype');
-        }
 
+        /* Mobile-first responsive adjustments */
+        @media (max-width: 768px) {
+            .mobile-header {
+                padding-top: 0.5rem !important;
+                padding-bottom: 0.5rem !important;
+            }
+            
+            .mobile-chat-header {
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+            }
+        }
     </style>
 </head>
 
 <body class="bg-gray-900 h-screen overflow-hidden">
     <div class="flex flex-col h-screen">
-        <header class="bg-gray-800 text-white px-6 py-4 flex items-center justify-between border-b border-gray-700">
-            <div class="flex items-center gap-4">
-                <div class="font-['Pacifico'] text-2xl text-primary">Whispr</div>
-                <div class="flex items-center gap-3 ml-6">
-                    <div class="w-10 h-10 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold cursor-pointer"
+        <!-- Main Header - Much Thinner -->
+        <header class="bg-gray-800 text-white px-4 py-3 md:px-6 md:py-3 flex items-center justify-between border-b border-gray-700 mobile-header">
+            <div class="flex items-center gap-3">
+                <div class="font-['Pacifico'] text-xl md:text-2xl text-primary">Whispr</div>
+                <div class="flex items-center gap-2 md:gap-3">
+                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold cursor-pointer"
                          onclick="openUniqueKeyModal()">
-                        <i class="ri-user-line text-gray-300"></i>
+                        <i class="ri-user-line text-gray-300 text-sm md:text-base"></i>
                     </div>
-                    <span class="text-lg font-medium" id="username">{{ user }}</span>
+                    <span class="text-base md:text-lg font-medium" id="username">{{ user }}</span>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
                 <button
-                    class="w-8 h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors">
-                    <i class="ri-notification-line text-lg"></i>
+                    class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors">
+                    <i class="ri-notification-line text-sm md:text-lg"></i>
                 </button>
             </div>
         </header>
+
         <div class="flex flex-1 overflow-hidden">
             <!-- Sidebar - Contacts List -->
-            <div class="w-full md:w-80 bg-gray-800 border-r border-gray-700 flex flex-col md:block hidden" id="sidebar">
-                <div class="p-4 border-b border-gray-700">
+            <div class="w-full md:w-80 bg-gray-800 border-r border-gray-700 flex flex-col" id="sidebar">
+                <div class="p-3 md:p-4 border-b border-gray-700">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-white">Chats</h2>
+                        <h2 class="text-base md:text-lg font-semibold text-white">Chats</h2>
                         <div class="flex items-center gap-2">
                             <button
-                                class="w-8 h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
+                                class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
                                 id="backToChat">
-                                <i class="ri-arrow-right-line text-gray-300"></i>
+                                <i class="ri-arrow-right-line text-gray-300 text-sm"></i>
                             </button>
                             <div class="relative">
                                 <button
-                                    class="w-8 h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors"
+                                    class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors"
                                     id="settingsBtn">
-                                    <i class="ri-settings-line text-gray-300"></i>
+                                    <i class="ri-settings-line text-gray-300 text-sm md:text-base"></i>
                                 </button>
-                                <div class="absolute right-0 top-10 bg-gray-700 border border-gray-600 rounded-lg shadow-lg py-2 w-48 hidden z-10"
+                                <div class="absolute right-0 top-9 md:top-10 bg-gray-700 border border-gray-600 rounded-lg shadow-lg py-2 w-40 md:w-48 hidden z-10"
                                     id="settingsMenu">
                                     <button onclick="openAddUserModal()"
-                                        class="w-full px-4 py-2 text-left hover:bg-gray-600 flex items-center gap-3 text-white">
-                                        <i class="ri-user-add-line text-gray-300"></i>
+                                        class="w-full px-3 py-2 md:px-4 md:py-2 text-left hover:bg-gray-600 flex items-center gap-2 md:gap-3 text-white text-sm md:text-base">
+                                        <i class="ri-user-add-line text-gray-300 text-sm"></i>
                                         Add new user
                                     </button>
                                     <button onclick="showNotifications()"
-                                        class="w-full px-4 py-2 text-left hover:bg-gray-600 flex items-center gap-3 text-white">
-                                        <i class="ri-notification-line text-gray-300"></i>
+                                        class="w-full px-3 py-2 md:px-4 md:py-2 text-left hover:bg-gray-600 flex items-center gap-2 md:gap-3 text-white text-sm md:text-base">
+                                        <i class="ri-notification-line text-gray-300 text-sm"></i>
                                         Notifications
                                     </button>
                                 </div>
@@ -124,43 +131,48 @@
             </div>
 
             <!-- Chat Area -->
-            <div class="flex-1 flex flex-col bg-gray-900 h-full" id="chatArea">
-                <div class="bg-gray-800 border-b border-gray-700 px-4 md:px-6 py-4 flex items-center gap-3 flex-shrink-0"
+            <div class="flex-1 flex flex-col bg-gray-900 h-full hidden md:flex" id="chatArea">
+                <!-- Chat Header - Much Thinner -->
+                <div class="bg-gray-800 border-b border-gray-700 px-4 py-3 md:px-6 md:py-3 flex items-center gap-3 flex-shrink-0 mobile-chat-header"
                     id="chatHeader">
                     <button
-                        class="w-8 h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
+                        class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
                         id="backToContacts">
-                        <i class="ri-arrow-left-line text-gray-300"></i>
+                        <i class="ri-arrow-left-line text-gray-300 text-sm"></i>
                     </button>
-                    <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center" id="chatContactImage">
-                        <i class="ri-user-line text-gray-300"></i>
+                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gray-600 flex items-center justify-center" id="chatContactImage">
+                        <i class="ri-user-line text-gray-300 text-sm md:text-base"></i>
                     </div>
                     <div class="flex-1">
-                        <h3 class="font-medium text-white" id="chatContactName">Select a contact</h3>
-                        <p class="text-sm text-gray-400" id="chatStatus">Offline</p>
+                        <h3 class="font-medium text-white text-sm md:text-base" id="chatContactName">Select a contact</h3>
+                        <p class="text-xs text-gray-400" id="chatStatus">Offline</p>
                     </div>
                 </div>
-                <div class="flex-1 overflow-y-auto p-4 md:p-6 chat-bg min-h-0" id="messagesArea">
-                    <div class="space-y-4 relative z-10 min-h-full" id="messagesContainer">
+
+                <!-- Messages Area -->
+                <div class="flex-1 overflow-y-auto p-3 md:p-6 chat-bg min-h-0" id="messagesArea">
+                    <div class="space-y-3 md:space-y-4 relative z-10 min-h-full" id="messagesContainer">
                         <!-- Messages will be dynamically rendered here -->
                         <div class="flex justify-center">
-                            <div class="bg-gray-700 rounded-lg px-4 py-2">
-                                <p class="text-gray-400 text-sm">Select a contact to start chatting</p>
+                            <div class="bg-gray-700 rounded-lg px-3 py-2 md:px-4 md:py-2">
+                                <p class="text-gray-400 text-xs md:text-sm">Select a contact to start chatting</p>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Input Area -->
                 <div class="border-t border-gray-700 p-3 md:p-4 bg-gray-800 flex-shrink-0">
                     <div class="flex items-center gap-2 md:gap-3">
                         <div class="flex-1 relative">
                             <input
-                                class="w-full px-4 py-2 bg-gray-700 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
+                                class="w-full px-3 py-2 md:px-4 md:py-2 bg-gray-700 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 text-xs md:text-sm"
                                 id="messageInput" placeholder="Type a message..." type="text" />
                         </div>
                         <button
-                            class="w-10 h-10 flex items-center justify-center bg-primary hover:bg-primary/90 text-black rounded-full transition-colors !rounded-button whitespace-nowrap"
+                            class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-primary hover:bg-primary/90 text-black rounded-full transition-colors !rounded-button whitespace-nowrap"
                             id="sendBtn" onclick="sendMessage()">
-                            <i class="ri-send-plane-fill"></i>
+                            <i class="ri-send-plane-fill text-sm md:text-base"></i>
                         </button>
                     </div>
                 </div>
@@ -173,13 +185,13 @@
 
     <!-- Unique Key Modal -->
     <div id="uniqueKeyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-800 rounded-lg shadow-lg w-96 p-6 border border-gray-700">
+        <div class="bg-gray-800 rounded-lg shadow-lg w-11/12 md:w-96 p-4 md:p-6 border border-gray-700 mx-4">
             <h2 class="text-lg font-semibold text-white mb-4">Enter your Unique Key</h2>
             <input id="uniqueKeyInput" type="text" placeholder="Unique Key"
-                   class="w-full border border-gray-600 bg-gray-700 text-white px-3 py-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-primary" />
+                   class="w-full border border-gray-600 bg-gray-700 text-white px-3 py-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-primary text-sm md:text-base" />
             <div class="flex justify-end gap-2">
-                <button onclick="closeUniqueKeyModal()" class="px-4 py-2 rounded bg-gray-600 text-white hover:bg-gray-700 transition-colors">Cancel</button>
-                <button onclick="saveUniqueKey()" class="px-4 py-2 rounded bg-primary text-black hover:bg-primary/90 transition-colors">Save</button>
+                <button onclick="closeUniqueKeyModal()" class="px-3 py-2 md:px-4 md:py-2 rounded bg-gray-600 text-white hover:bg-gray-700 transition-colors text-sm">Cancel</button>
+                <button onclick="saveUniqueKey()" class="px-3 py-2 md:px-4 md:py-2 rounded bg-primary text-black hover:bg-primary/90 transition-colors text-sm">Save</button>
             </div>
             <p id="modalMessage" class="text-sm mt-3"></p>
         </div>
@@ -187,26 +199,26 @@
 
     <!-- Add User Modal -->
     <div id="addUserModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-96 border border-gray-700">
+        <div class="bg-gray-800 p-4 md:p-6 rounded-lg shadow-lg w-11/12 md:w-96 border border-gray-700 mx-4">
             <h2 class="text-xl font-semibold text-white mb-4">Add New User</h2>
 
             <label class="block mb-2 text-sm font-medium text-gray-300">Username</label>
             <input id="newUsername" type="text"
-                  class="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                  class="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded mb-4 focus:outline-none focus:ring-2 focus:ring-primary text-sm md:text-base"
                   placeholder="Enter username">
 
             <label class="block mb-2 text-sm font-medium text-gray-300">Key</label>
             <input id="newUserKey" type="text"
-                  class="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded mb-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                  class="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded mb-4 focus:outline-none focus:ring-2 focus:ring-primary text-sm md:text-base"
                   placeholder="Enter key">
 
             <div id="addUserMessage" class="text-sm mb-3"></div>
 
             <div class="flex justify-end gap-3">
                 <button onclick="closeAddUserModal()"
-                        class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors">Cancel</button>
+                        class="px-3 py-2 md:px-4 md:py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors text-sm">Cancel</button>
                 <button onclick="connectUser()"
-                        class="px-4 py-2 bg-primary text-black rounded hover:bg-primary/90 transition-colors">Connect</button>
+                        class="px-3 py-2 md:px-4 md:py-2 bg-primary text-black rounded hover:bg-primary/90 transition-colors text-sm">Connect</button>
             </div>
         </div>
     </div>
@@ -238,23 +250,45 @@
 
             // Initialize UI interactions
             initializeUI();
+
+            // Set initial mobile state
+            handleMobileLayout();
         };
+
+        // Handle mobile layout
+        function handleMobileLayout() {
+            if (window.innerWidth < 768) {
+                // On mobile, show contacts by default, hide chat
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('chatArea').classList.add('hidden');
+            } else {
+                // On desktop, show both
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('chatArea').classList.remove('hidden');
+            }
+        }
 
         // Initialize UI event listeners
         function initializeUI() {
             // Settings menu
             const settingsBtn = document.getElementById('settingsBtn');
             const settingsMenu = document.getElementById('settingsMenu');
-            settingsBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                settingsMenu.classList.toggle('hidden');
-            });
+            if (settingsBtn && settingsMenu) {
+                settingsBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    settingsMenu.classList.toggle('hidden');
+                });
+            }
+
             document.addEventListener('click', function () {
-                settingsMenu.classList.add('hidden');
+                if (settingsMenu) settingsMenu.classList.add('hidden');
             });
-            settingsMenu.addEventListener('click', function (e) {
-                e.stopPropagation();
-            });
+
+            if (settingsMenu) {
+                settingsMenu.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+            }
 
             // Mobile navigation
             const backToContacts = document.getElementById('backToContacts');
@@ -262,56 +296,59 @@
             const sidebar = document.getElementById('sidebar');
             const chatArea = document.getElementById('chatArea');
 
-            backToContacts.addEventListener('click', function () {
-                sidebar.classList.remove('hidden');
-                chatArea.classList.add('hidden');
-            });
+            if (backToContacts) {
+                backToContacts.addEventListener('click', function () {
+                    sidebar.classList.remove('hidden');
+                    chatArea.classList.add('hidden');
+                });
+            }
 
-            backToChat.addEventListener('click', function () {
-                sidebar.classList.add('hidden');
-                chatArea.classList.remove('hidden');
-            });
+            if (backToChat) {
+                backToChat.addEventListener('click', function () {
+                    sidebar.classList.add('hidden');
+                    chatArea.classList.remove('hidden');
+                });
+            }
 
             // Message input enter key
             const messageInput = document.getElementById('messageInput');
-            messageInput.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
+            if (messageInput) {
+                messageInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            }
 
             // Responsive behavior
-            window.addEventListener('resize', function () {
-                if (window.innerWidth >= 768) {
-                    sidebar.classList.remove('hidden');
-                    chatArea.classList.remove('hidden');
-                }
-            });
+            window.addEventListener('resize', handleMobileLayout);
         }
 
         // Render contacts list
         function renderContacts(contacts) {
             const contactsList = document.getElementById("contactsList");
+            if (!contactsList) return;
+
             contactsList.innerHTML = "";
 
             contacts.forEach(contact => {
                 const contactEl = document.createElement("div");
-                contactEl.className = "contact-item hover:bg-gray-700 px-4 py-3 cursor-pointer flex items-center gap-3 border-b border-gray-700";
+                contactEl.className = "contact-item hover:bg-gray-700 px-3 py-2 md:px-4 md:py-3 cursor-pointer flex items-center gap-3 border-b border-gray-700";
                 contactEl.setAttribute("data-contact", contact);
 
                 const avatar = document.createElement("div");
-                avatar.className = "w-12 h-12 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold";
-                avatar.innerHTML = `<i class="ri-user-line text-gray-300"></i>`;
+                avatar.className = "w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold";
+                avatar.innerHTML = `<i class="ri-user-line text-gray-300 text-sm"></i>`;
 
                 const contactInfo = document.createElement("div");
                 contactInfo.className = "flex-1 min-w-0";
                 
                 const name = document.createElement("h3");
-                name.className = "font-medium text-white truncate";
+                name.className = "font-medium text-white truncate text-sm md:text-base";
                 name.textContent = contact;
 
                 const lastMessage = document.createElement("p");
-                lastMessage.className = "text-sm text-gray-400 truncate";
+                lastMessage.className = "text-gray-400 truncate text-xs";
                 lastMessage.textContent = "Click to start chatting";
 
                 contactInfo.appendChild(name);
@@ -371,6 +408,8 @@
         // Render chat history
         function renderChatHistory(history) {
             const messagesContainer = document.getElementById("messagesContainer");
+            if (!messagesContainer) return;
+
             messagesContainer.innerHTML = "";
 
             history.forEach(pair => {
@@ -381,7 +420,9 @@
 
             // Scroll to bottom
             const messagesArea = document.getElementById("messagesArea");
-            messagesArea.scrollTop = messagesArea.scrollHeight;
+            if (messagesArea) {
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            }
         }
 
         // WebSocket connection
@@ -411,6 +452,8 @@
         // Send message
         function sendMessage() {
             const msgInput = document.getElementById("messageInput");
+            if (!msgInput) return;
+            
             const msg = msgInput.value.trim();
             if (!msg) return;
             if (!activeChatUser) return alert("Please select a contact first.");
@@ -427,6 +470,8 @@
         // Append message to chat
         function appendMessage(sender, messageText) {
             const messagesContainer = document.getElementById("messagesContainer");
+            if (!messagesContainer) return;
+
             const wrapper = document.createElement("div");
 
             if (sender === currentUser) {
@@ -444,12 +489,12 @@
 
             const bubble = document.createElement("div");
             bubble.className = sender === currentUser
-                ? "max-w-xs bg-primary text-black rounded-lg px-4 py-2"
-                : "max-w-xs bg-gray-700 text-white rounded-lg px-4 py-2 shadow-sm";
+                ? "max-w-xs bg-primary text-black rounded-lg px-3 py-2 md:px-4 md:py-2"
+                : "max-w-xs bg-gray-700 text-white rounded-lg px-3 py-2 md:px-4 md:py-2 shadow-sm";
 
             bubble.innerHTML = `
                 <p class="text-xs font-semibold mb-1 ${sender === currentUser ? 'text-gray-800' : 'text-gray-300'}">${sender}</p>
-                <p>${escapeHtml(messageText)}</p>
+                <p class="text-sm">${escapeHtml(messageText)}</p>
                 <span class="text-xs ${sender === currentUser ? 'text-gray-800' : 'text-gray-400'} mt-1 block">${timeString}</span>
             `;
 
@@ -458,7 +503,9 @@
 
             // Scroll to bottom
             const messagesArea = document.getElementById("messagesArea");
-            messagesArea.scrollTop = messagesArea.scrollHeight;
+            if (messagesArea) {
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+            }
         }
 
         // Unique Key Modal functions
