@@ -53,11 +53,6 @@
             pointer-events: none;
         }
 
-        /* Ensure proper mobile layout */
-        .mobile-safe-area {
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-
         /* Mobile-first responsive adjustments */
         @media (max-width: 768px) {
             .mobile-header {
@@ -75,14 +70,6 @@
                 padding-bottom: 0.75rem !important;
             }
         }
-        @font-face {
-            font-family: 'Pacifico';
-            font-style: normal;
-            font-weight: 400;
-            font-display: swap;
-            src: url(https://fonts.gstatic.com/s/pacifico/v23/FwZY7-Qmy14u9lezJ96A.ttf) format('truetype');
-        }
-
     </style>
 </head>
 
@@ -149,7 +136,7 @@
             </div>
 
             <!-- Chat Area -->
-            <div class="flex-1 flex flex-col bg-gray-900 h-full hidden md:flex" id="chatArea">
+            <div class="flex-1 flex flex-col bg-gray-900 h-full" id="chatArea">
                 <!-- Chat Header - Much Thinner -->
                 <div class="bg-gray-800 border-b border-gray-700 px-4 py-3 md:px-6 md:py-3 flex items-center gap-3 flex-shrink-0 mobile-chat-header"
                     id="chatHeader">
@@ -180,7 +167,7 @@
                 </div>
 
                 <!-- Input Area - Fixed for mobile visibility -->
-                <div class="border-t border-gray-700 p-3 bg-gray-800 flex-shrink-0 mobile-input-area mobile-safe-area">
+                <div class="border-t border-gray-700 p-3 bg-gray-800 flex-shrink-0 mobile-input-area">
                     <div class="flex items-center gap-2">
                         <div class="flex-1 relative">
                             <input
@@ -271,25 +258,7 @@
 
             // Set initial mobile state
             handleMobileLayout();
-
-            // Ensure input area is visible on mobile
-            ensureMobileInputVisibility();
         };
-
-        // Ensure mobile input visibility
-        function ensureMobileInputVisibility() {
-            if (window.innerWidth < 768) {
-                const chatArea = document.getElementById('chatArea');
-                const inputArea = chatArea?.querySelector('.mobile-input-area');
-                
-                if (inputArea) {
-                    // Force input area to be visible and properly positioned
-                    inputArea.style.position = 'relative';
-                    inputArea.style.zIndex = '50';
-                    inputArea.style.backgroundColor = '#1f2937'; // bg-gray-800
-                }
-            }
-        }
 
         // Handle mobile layout
         function handleMobileLayout() {
@@ -326,25 +295,29 @@
                 });
             }
 
-            // Mobile navigation
+            // Mobile navigation - FIXED: Proper event listeners
             const backToContacts = document.getElementById('backToContacts');
             const backToChat = document.getElementById('backToChat');
             const sidebar = document.getElementById('sidebar');
             const chatArea = document.getElementById('chatArea');
 
             if (backToContacts) {
-                backToContacts.addEventListener('click', function () {
+                backToContacts.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Back to contacts clicked');
                     sidebar.classList.remove('hidden');
                     chatArea.classList.add('hidden');
                 });
             }
 
             if (backToChat) {
-                backToChat.addEventListener('click', function () {
+                backToChat.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Back to chat clicked');
                     sidebar.classList.add('hidden');
                     chatArea.classList.remove('hidden');
-                    // Ensure input is visible when switching to chat
-                    setTimeout(ensureMobileInputVisibility, 100);
                 });
             }
 
@@ -357,29 +330,43 @@
                     }
                 });
 
-                // Focus input when chat area becomes visible on mobile
-                messageInput.addEventListener('focus', function() {
-                    // Scroll to bottom to ensure input is visible when keyboard opens
-                    setTimeout(() => {
-                        const messagesArea = document.getElementById('messagesArea');
-                        if (messagesArea) {
-                            messagesArea.scrollTop = messagesArea.scrollHeight;
-                        }
-                    }, 300);
+                // Prevent input focus from triggering navigation
+                messageInput.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+
+                messageInput.addEventListener('focus', function (e) {
+                    e.stopPropagation();
+                });
+            }
+
+            // Prevent chat area clicks from going back to contacts
+            const messagesArea = document.getElementById('messagesArea');
+            if (messagesArea) {
+                messagesArea.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+            }
+
+            const messagesContainer = document.getElementById('messagesContainer');
+            if (messagesContainer) {
+                messagesContainer.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+            }
+
+            const chatHeader = document.getElementById('chatHeader');
+            if (chatHeader) {
+                chatHeader.addEventListener('click', function (e) {
+                    // Only stop propagation if not clicking the back button
+                    if (!e.target.closest('#backToContacts')) {
+                        e.stopPropagation();
+                    }
                 });
             }
 
             // Responsive behavior
-            window.addEventListener('resize', function() {
-                handleMobileLayout();
-                ensureMobileInputVisibility();
-            });
-
-            // Handle virtual keyboard on mobile
-            window.addEventListener('resize', function() {
-                // This helps when virtual keyboard appears/disappears
-                setTimeout(ensureMobileInputVisibility, 100);
-            });
+            window.addEventListener('resize', handleMobileLayout);
         }
 
         // Render contacts list
@@ -415,8 +402,13 @@
                 contactEl.appendChild(avatar);
                 contactEl.appendChild(contactInfo);
 
-                // Contact click handler
-                contactEl.onclick = () => {
+                // Contact click handler - FIXED: Proper navigation
+                contactEl.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Contact clicked:', contact);
+
                     // Update active state
                     document.querySelectorAll('.contact-item').forEach(item => {
                         item.classList.remove('bg-primary/20', 'border-r-4', 'border-primary');
@@ -434,15 +426,17 @@
 
                     // Mobile: switch to chat view
                     if (window.innerWidth < 768) {
+                        console.log('Switching to chat view on mobile');
                         document.getElementById('sidebar').classList.add('hidden');
                         document.getElementById('chatArea').classList.remove('hidden');
-                        // Ensure input is visible after switching
-                        setTimeout(ensureMobileInputVisibility, 100);
+                        
                         // Focus input for immediate typing
                         setTimeout(() => {
                             const messageInput = document.getElementById('messageInput');
-                            if (messageInput) messageInput.focus();
-                        }, 200);
+                            if (messageInput) {
+                                messageInput.focus();
+                            }
+                        }, 100);
                     }
                 };
 
