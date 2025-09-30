@@ -7,5 +7,3 @@ async def create_contact(collection_name:str, user_data:dict):
     # Insert the new user document
     result = await collection.insert_one(user_data)
 
-    print(f"New user created with _id: {result.inserted_id}")
-

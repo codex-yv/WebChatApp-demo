@@ -14,13 +14,10 @@ from utils.userPuts import update_user_cred_one, update_user_contact, update_con
 from utils.chatsDB import create_contact
 from utils.chatsDBposts import insert_chat
 from utils.chatsDBgets import get_chat
+from utils.IST import ISTtime
 from security.encryptChat import encryptt
 import json
 
-
-class Password:
-    def __init__(self, password):
-        self.password = password
 
 app = FastAPI()
 
@@ -195,11 +192,12 @@ async def connect_user(request:Request, data:dict = Body(...)):
             await update_contact_keys(collection_name=new_user, field_name="key", field_value=key, new_contact=current_user, key=contact_format )
 
             keyy, token = encryptt(chat="INITIATED THE CHAT")
-
+            current_time = ISTtime()
             chat = {
                 "user":current_user,
                 "message": token,
-                "key": keyy
+                "key": keyy,
+                "time": current_time
             }
             
             await create_contact(collection_name=contact_format, user_data=chat)

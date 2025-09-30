@@ -275,7 +275,7 @@
                 });
             }
 
-            // Mobile navigation - SIMPLIFIED
+            // Mobile navigation
             const backToContacts = document.getElementById('backToContacts');
             if (backToContacts) {
                 backToContacts.addEventListener('click', function () {
@@ -302,6 +302,8 @@
             if (window.innerWidth < 768) {
                 document.getElementById('sidebar').classList.remove('hidden');
                 document.getElementById('chatArea').classList.add('hidden');
+                // Reset chat header to default state when going back to contacts
+                resetChatHeader();
             }
         }
 
@@ -311,6 +313,22 @@
                 document.getElementById('sidebar').classList.add('hidden');
                 document.getElementById('chatArea').classList.remove('hidden');
             }
+        }
+
+        // Reset chat header to default state
+        function resetChatHeader() {
+            document.getElementById("chatContactName").textContent = "Select a contact";
+            document.getElementById("chatStatus").textContent = "Offline";
+            activeChatUser = null;
+            
+            // Clear messages
+            document.getElementById("messagesContainer").innerHTML = `
+                <div class="flex justify-center">
+                    <div class="bg-gray-700 rounded-lg px-3 py-2 md:px-4 md:py-2">
+                        <p class="text-gray-400 text-xs md:text-sm">Select a contact to start chatting</p>
+                    </div>
+                </div>
+            `;
         }
 
         // Render contacts list
@@ -346,7 +364,7 @@
                 contactEl.appendChild(avatar);
                 contactEl.appendChild(contactInfo);
 
-                // Contact click handler - SIMPLIFIED
+                // Contact click handler
                 contactEl.onclick = () => {
                     // Update active state
                     document.querySelectorAll('.contact-item').forEach(item => {
@@ -397,17 +415,20 @@
             }
         }
 
-        // Render chat history
+        // Render chat history - UPDATED for new format with timestamps
         function renderChatHistory(history) {
             const messagesContainer = document.getElementById("messagesContainer");
             if (!messagesContainer) return;
 
             messagesContainer.innerHTML = "";
 
-            history.forEach(pair => {
-                const sender = pair[0];
-                const message = pair[1];
-                appendMessage(sender, message);
+            history.forEach(messageData => {
+                // Handle both old format [sender, message] and new format [sender, message, timestamp]
+                const sender = messageData[0];
+                const messageText = messageData[1];
+                const timestamp = messageData[2] || null; // Use provided timestamp or null if not available
+                
+                appendMessage(sender, messageText, timestamp);
             });
 
             // Scroll to bottom
@@ -462,8 +483,8 @@
             }
         }
 
-        // Append message to chat
-        function appendMessage(sender, messageText) {
+        // Append message to chat - UPDATED to handle timestamps
+        function appendMessage(sender, messageText, timestamp = null) {
             const messagesContainer = document.getElementById("messagesContainer");
             if (!messagesContainer) return;
 
@@ -475,8 +496,8 @@
                 wrapper.className = "flex justify-start";
             }
 
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', {
+            // Use provided timestamp or generate current time
+            const timeString = timestamp || new Date().toLocaleTimeString('en-US', {
                 hour: 'numeric',
                 minute: '2-digit',
                 hour12: true

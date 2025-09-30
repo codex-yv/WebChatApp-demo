@@ -9,8 +9,8 @@ async def get_chat(collection_name):
 
     # Format and print data
     try:
-        formatted_data = [(doc['user'], decryptt(token=doc['message'], key=doc['key'])) for doc in data]
+        formatted_data = [(doc['user'], decryptt(token=doc['message'], key=doc['key']), doc['time']) for doc in data]
     except KeyError:
-        formatted_data = [(data[0]['user'], "Update in database took place all chat deleted.")]
+        formatted_data = [(data[0]['user'], "Update in database took place all chat deleted.", data[0]['time'])]
         
     return formatted_data
