@@ -14,6 +14,7 @@ from utils.userPuts import update_user_cred_one, update_user_contact, update_con
 from utils.chatsDB import create_contact
 from utils.chatsDBposts import insert_chat
 from utils.chatsDBgets import get_chat
+from security.encryptChat import encryptt
 import json
 
 
@@ -44,13 +45,6 @@ connected_users = {}
 async def get(request: Request):
     return templates.TemplateResponse("homepage.html", {"request": request})
 
-@app.get("/login", response_class=HTMLResponse)
-async def Login(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
-
-@app.get("/register",response_class=HTMLResponse)
-async def Register(request: Request):
-    return templates.TemplateResponse("signup.html", {"request": request})
 
 @app.websocket("/ws/{user_id}")
 async def websocket_endpoint(user_id: str, websocket: WebSocket):
@@ -199,10 +193,15 @@ async def connect_user(request:Request, data:dict = Body(...)):
             contact_format = new_user + current_user 
             await update_contact_keys(collection_name=current_user, field_name="password", field_value=request.session.get("password"), new_contact=new_user, key=contact_format)
             await update_contact_keys(collection_name=new_user, field_name="key", field_value=key, new_contact=current_user, key=contact_format )
+
+            keyy, token = encryptt(chat="INITIATED THE CHAT")
+
             chat = {
                 "user":current_user,
-                "message": f"{current_user} INITIATED THE CHAT"
+                "message": token,
+                "key": keyy
             }
+            
             await create_contact(collection_name=contact_format, user_data=chat)
 
             contact_list = await get_user_cred_contacts(collection_name=current_user)    
