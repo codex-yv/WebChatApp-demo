@@ -65,3 +65,13 @@ async def get_user_contacts_key(collection_name, contact_name) -> list:
         return results
     except KeyError:
         pass
+
+
+async def get_user_status(collection_name):
+    db = client["Users"]
+    collection = db[collection_name]
+
+    documents = await collection.find({}, {"_id": 0}).to_list()
+
+    status = documents[0]['status']
+    return status

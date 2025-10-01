@@ -56,101 +56,100 @@
 </head>
 
 <body class="bg-gray-900 h-screen overflow-hidden">
-    <div class="flex flex-col h-screen">
-        <!-- Main Header - ALWAYS VISIBLE -->
-        <header class="bg-gray-800 text-white px-4 py-3 md:px-6 md:py-3 flex items-center justify-between border-b border-gray-700">
-            <div class="flex items-center gap-3">
-                <div class="font-['Pacifico'] text-xl md:text-2xl text-primary">Whispr</div>
-                <div class="flex items-center gap-2 md:gap-3">
-                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold cursor-pointer"
-                         onclick="openUniqueKeyModal()">
-                        <i class="ri-user-line text-gray-300 text-sm md:text-base"></i>
-                    </div>
-                    <span class="text-base md:text-lg font-medium" id="username">{{ user }}</span>
+    <!-- Main Header - SEPARATE FROM THE MAIN CONTENT, ALWAYS VISIBLE -->
+    <header class="bg-gray-800 text-white px-4 py-3 md:px-6 md:py-3 flex items-center justify-between border-b border-gray-700">
+        <div class="flex items-center gap-3">
+            <div class="font-['Pacifico'] text-xl md:text-2xl text-primary">Whispr</div>
+            <div class="flex items-center gap-2 md:gap-3">
+                <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gray-600 text-white flex items-center justify-center font-bold cursor-pointer"
+                     onclick="openUniqueKeyModal()">
+                    <i class="ri-user-line text-gray-300 text-sm md:text-base"></i>
                 </div>
+                <span class="text-base md:text-lg font-medium" id="username">{{ user }}</span>
             </div>
-            <div class="flex items-center gap-3">
-                <button class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors">
-                    <i class="ri-notification-line text-sm md:text-lg"></i>
-                </button>
-            </div>
-        </header>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors">
+                <i class="ri-notification-line text-sm md:text-lg"></i>
+            </button>
+        </div>
+    </header>
 
-        <div class="flex flex-1 overflow-hidden">
-            <!-- Sidebar - Contacts List -->
-            <div class="w-full md:w-80 bg-gray-800 border-r border-gray-700 flex flex-col" id="sidebar">
-                <div class="p-3 md:p-4 border-b border-gray-700">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-base md:text-lg font-semibold text-white">Chats</h2>
-                        <div class="flex items-center gap-2">
-                            <div class="relative">
-                                <button class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors"
-                                    id="settingsBtn">
-                                    <i class="ri-settings-line text-gray-300 text-sm md:text-base"></i>
-                                </button>
-                                <div class="absolute right-0 top-9 md:top-10 bg-gray-700 border border-gray-600 rounded-lg shadow-lg py-2 w-40 md:w-48 hidden z-10"
-                                    id="settingsMenu">
-                                    <button onclick="openAddUserModal()"
-                                        class="w-full px-3 py-2 md:px-4 md:py-2 text-left hover:bg-gray-600 flex items-center gap-2 md:gap-3 text-white text-sm md:text-base">
-                                        <i class="ri-user-add-line text-gray-300 text-sm"></i>
-                                        Add new user
-                                    </button>
-                                    <button onclick="showNotifications()"
-                                        class="w-full px-3 py-2 md:px-4 md:py-2 text-left hover:bg-gray-600 flex items-center gap-2 md:gap-3 text-white text-sm md:text-base">
-                                        <i class="ri-notification-line text-gray-300 text-sm"></i>
-                                        Notifications
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex-1 overflow-y-auto" id="contactsList">
-                    <!-- Contacts will be dynamically rendered here -->
-                </div>
-            </div>
-
-            <!-- Chat Area -->
-            <div class="flex-1 flex flex-col bg-gray-900 h-full" id="chatArea">
-                <!-- Chat Header - Only shows contact info, NOT the main header -->
-                <div class="bg-gray-800 border-b border-gray-700 px-4 py-3 md:px-6 md:py-3 flex items-center gap-3 flex-shrink-0"
-                    id="chatHeader">
-                    <button class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
-                        id="backToContacts">
-                        <i class="ri-arrow-left-line text-gray-300 text-sm"></i>
-                    </button>
-                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gray-600 flex items-center justify-center" id="chatContactImage">
-                        <i class="ri-user-line text-gray-300 text-sm md:text-base"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="font-medium text-white text-sm md:text-base" id="chatContactName">Select a contact</h3>
-                        <p class="text-xs text-gray-400" id="chatStatus">Offline</p>
-                    </div>
-                </div>
-
-                <!-- Messages Area -->
-                <div class="flex-1 overflow-y-auto p-3 md:p-6 chat-bg min-h-0" id="messagesArea">
-                    <div class="space-y-3 md:space-y-4 relative z-10 min-h-full" id="messagesContainer">
-                        <div class="flex justify-center">
-                            <div class="bg-gray-700 rounded-lg px-3 py-2 md:px-4 md:py-2">
-                                <p class="text-gray-400 text-xs md:text-sm">Select a contact to start chatting</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Input Area -->
-                <div class="border-t border-gray-700 p-3 bg-gray-800 flex-shrink-0">
+    <!-- Main Content Area - BELOW THE HEADER -->
+    <div class="flex-1 flex overflow-hidden" style="height: calc(100vh - 64px);">
+        <!-- Sidebar - Contacts List -->
+        <div class="w-full md:w-80 bg-gray-800 border-r border-gray-700 flex flex-col" id="sidebar">
+            <div class="p-3 md:p-4 border-b border-gray-700">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-base md:text-lg font-semibold text-white">Chats</h2>
                     <div class="flex items-center gap-2">
-                        <div class="flex-1 relative">
-                            <input class="w-full px-3 py-2 bg-gray-700 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
-                                id="messageInput" placeholder="Type a message..." type="text" />
+                        <div class="relative">
+                            <button class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors"
+                                id="settingsBtn">
+                                <i class="ri-settings-line text-gray-300 text-sm md:text-base"></i>
+                            </button>
+                            <div class="absolute right-0 top-9 md:top-10 bg-gray-700 border border-gray-600 rounded-lg shadow-lg py-2 w-40 md:w-48 hidden z-10"
+                                id="settingsMenu">
+                                <button onclick="openAddUserModal()"
+                                    class="w-full px-3 py-2 md:px-4 md:py-2 text-left hover:bg-gray-600 flex items-center gap-2 md:gap-3 text-white text-sm md:text-base">
+                                    <i class="ri-user-add-line text-gray-300 text-sm"></i>
+                                    Add new user
+                                </button>
+                                <button onclick="showNotifications()"
+                                    class="w-full px-3 py-2 md:px-4 md:py-2 text-left hover:bg-gray-600 flex items-center gap-2 md:gap-3 text-white text-sm md:text-base">
+                                    <i class="ri-notification-line text-gray-300 text-sm"></i>
+                                    Notifications
+                                </button>
+                            </div>
                         </div>
-                        <button class="w-10 h-10 flex items-center justify-center bg-primary hover:bg-primary/90 text-black rounded-full transition-colors !rounded-button whitespace-nowrap flex-shrink-0"
-                            id="sendBtn" onclick="sendMessage()">
-                            <i class="ri-send-plane-fill text-base"></i>
-                        </button>
                     </div>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto" id="contactsList">
+                <!-- Contacts will be dynamically rendered here -->
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="flex-1 flex flex-col bg-gray-900 h-full hidden md:flex" id="chatArea">
+            <!-- Chat Header - This is INSIDE the chat area, not the main header -->
+            <div class="bg-gray-800 border-b border-gray-700 px-4 py-3 md:px-6 md:py-3 flex items-center gap-3 flex-shrink-0"
+                id="chatHeader">
+                <button class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
+                    id="backToContacts">
+                    <i class="ri-arrow-left-line text-gray-300 text-sm"></i>
+                </button>
+                <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gray-600 flex items-center justify-center" id="chatContactImage">
+                    <i class="ri-user-line text-gray-300 text-sm md:text-base"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-medium text-white text-sm md:text-base" id="chatContactName">Select a contact</h3>
+                    <p class="text-xs text-gray-400" id="chatStatus">Offline</p>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="flex-1 overflow-y-auto p-3 md:p-6 chat-bg min-h-0" id="messagesArea">
+                <div class="space-y-3 md:space-y-4 relative z-10 min-h-full" id="messagesContainer">
+                    <div class="flex justify-center">
+                        <div class="bg-gray-700 rounded-lg px-3 py-2 md:px-4 md:py-2">
+                            <p class="text-gray-400 text-xs md:text-sm">Select a contact to start chatting</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t border-gray-700 p-3 bg-gray-800 flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <div class="flex-1 relative">
+                        <input class="w-full px-3 py-2 bg-gray-700 text-white placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
+                            id="messageInput" placeholder="Type a message..." type="text" />
+                    </div>
+                    <button class="w-10 h-10 flex items-center justify-center bg-primary hover:bg-primary/90 text-black rounded-full transition-colors !rounded-button whitespace-nowrap flex-shrink-0"
+                        id="sendBtn" onclick="sendMessage()">
+                        <i class="ri-send-plane-fill text-base"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -204,7 +203,6 @@
         let currentUser;
         let activeChatUser = null;
         let contacts = [];
-        let isLoadingHistory = false; // ADD THIS FLAG
 
         // Initialize application
         window.onload = () => {
@@ -214,21 +212,12 @@
                 return;
             }
 
-            // Update username in header
             document.getElementById("username").textContent = currentUser;
-
-            // Load contacts
             const contactsData = JSON.parse(document.getElementById("contacts-data").textContent || "[]");
             contacts = contactsData;
             renderContacts(contacts);
-
-            // Connect WebSocket
             connect(currentUser);
-
-            // Initialize UI interactions
             initializeUI();
-
-            // Set initial mobile state
             handleMobileLayout();
         };
 
@@ -239,27 +228,16 @@
             const chatArea = document.getElementById('chatArea');
             
             if (isMobile) {
-                // On mobile, show contacts by default, hide chat
-                if (!activeChatUser) {
-                    sidebar.classList.remove('hidden');
-                    chatArea.classList.add('hidden');
-                } else {
-                    sidebar.classList.add('hidden');
-                    chatArea.classList.remove('hidden');
-                }
+                sidebar.classList.remove('hidden');
+                chatArea.classList.add('hidden');
             } else {
-                // On desktop, show both
                 sidebar.classList.remove('hidden');
                 chatArea.classList.remove('hidden');
             }
-            
-            // Ensure main header is always visible
-            document.querySelector('header').classList.remove('hidden');
         }
 
         // Initialize UI event listeners
         function initializeUI() {
-            // Settings menu
             const settingsBtn = document.getElementById('settingsBtn');
             const settingsMenu = document.getElementById('settingsMenu');
             if (settingsBtn && settingsMenu) {
@@ -279,7 +257,6 @@
                 });
             }
 
-            // Mobile navigation
             const backToContacts = document.getElementById('backToContacts');
             if (backToContacts) {
                 backToContacts.addEventListener('click', function () {
@@ -287,7 +264,6 @@
                 });
             }
 
-            // Message input enter key
             const messageInput = document.getElementById('messageInput');
             if (messageInput) {
                 messageInput.addEventListener('keypress', function (e) {
@@ -297,7 +273,6 @@
                 });
             }
 
-            // Responsive behavior
             window.addEventListener('resize', handleMobileLayout);
         }
 
@@ -306,9 +281,6 @@
             if (window.innerWidth < 768) {
                 document.getElementById('sidebar').classList.remove('hidden');
                 document.getElementById('chatArea').classList.add('hidden');
-                // Ensure main header is visible when going back to contacts
-                document.querySelector('header').classList.remove('hidden');
-                // Reset chat header to default state when going back to contacts
                 resetChatHeader();
             }
         }
@@ -318,8 +290,6 @@
             if (window.innerWidth < 768) {
                 document.getElementById('sidebar').classList.add('hidden');
                 document.getElementById('chatArea').classList.remove('hidden');
-                // Ensure main header is visible when in chat view too
-                document.querySelector('header').classList.remove('hidden');
             }
         }
 
@@ -329,7 +299,6 @@
             document.getElementById("chatStatus").textContent = "Offline";
             activeChatUser = null;
             
-            // Clear messages
             document.getElementById("messagesContainer").innerHTML = `
                 <div class="flex justify-center">
                     <div class="bg-gray-700 rounded-lg px-3 py-2 md:px-4 md:py-2">
@@ -372,30 +341,23 @@
                 contactEl.appendChild(avatar);
                 contactEl.appendChild(contactInfo);
 
-                // Contact click handler - FIXED: Prevent message resending
                 contactEl.onclick = () => {
-                    // Don't do anything if clicking the same active contact
                     if (activeChatUser === contact) return;
                     
-                    // Update active state
                     document.querySelectorAll('.contact-item').forEach(item => {
                         item.classList.remove('bg-primary/20', 'border-r-4', 'border-primary');
                     });
                     contactEl.classList.add('bg-primary/20', 'border-r-4', 'border-primary');
 
-                    // Set active chat
                     activeChatUser = contact;
                     document.getElementById("chatContactName").textContent = contact;
                     document.getElementById("chatStatus").textContent = "Online";
                     
-                    // Clear and load chat history - THIS SHOULD NOT TRIGGER MESSAGE SENDING
                     document.getElementById("messagesContainer").innerHTML = "";
                     loadChatHistory(currentUser, contact);
 
-                    // Switch to chat view on mobile
                     showChatView();
                     
-                    // Focus input for immediate typing - BUT DON'T SEND ANY MESSAGE
                     setTimeout(() => {
                         const messageInput = document.getElementById('messageInput');
                         if (messageInput) messageInput.focus();
@@ -406,10 +368,8 @@
             });
         }
 
-        // Load chat history - FIXED VERSION
+        // Load chat history - UPDATED to handle status
         async function loadChatHistory(user, contact) {
-            isLoadingHistory = true; // Set flag to prevent WebSocket processing
-            
             try {
                 const response = await fetch("/chat-history", {
                     method: "POST",
@@ -418,22 +378,53 @@
                 });
 
                 if (response.ok) {
-                    const history = await response.json();
+                    const data = await response.json();
+                    // data should now be [history, status]
+                    const history = data[0];
+                    const status = data[1];
+                    
+                    // Update the chat status
+                    document.getElementById("chatStatus").textContent = status;
+                    
                     renderChatHistory(history);
                 } else {
                     console.error("Failed to load chat history:", response.status, await response.text());
                 }
             } catch (err) {
                 console.error("Error fetching chat history:", err);
-            } finally {
-                // Reset flag after a short delay to ensure all WebSocket messages are processed
-                setTimeout(() => {
-                    isLoadingHistory = false;
-                }, 1000);
             }
         }
 
-        // Render chat history - UPDATED for new format with timestamps
+        // Contact click handler - UPDATED to set initial status
+        contactEl.onclick = () => {
+            if (activeChatUser === contact) return;
+            
+            document.querySelectorAll('.contact-item').forEach(item => {
+                item.classList.remove('bg-primary/20', 'border-r-4', 'border-primary');
+            });
+            contactEl.classList.add('bg-primary/20', 'border-r-4', 'border-primary');
+
+            // Set active chat
+            activeChatUser = contact;
+            document.getElementById("chatContactName").textContent = contact;
+            // Set initial status to "Loading..." while we fetch the actual status
+            document.getElementById("chatStatus").textContent = "Loading...";
+            
+            // Clear and load chat history - this will also update the status
+            document.getElementById("messagesContainer").innerHTML = "";
+            loadChatHistory(currentUser, contact);
+
+            // Switch to chat view on mobile
+            showChatView();
+            
+            // Focus input for immediate typing
+            setTimeout(() => {
+                const messageInput = document.getElementById('messageInput');
+                if (messageInput) messageInput.focus();
+            }, 100);
+        };
+
+        // Render chat history
         function renderChatHistory(history) {
             const messagesContainer = document.getElementById("messagesContainer");
             if (!messagesContainer) return;
@@ -441,22 +432,20 @@
             messagesContainer.innerHTML = "";
 
             history.forEach(messageData => {
-                // Handle both old format [sender, message] and new format [sender, message, timestamp]
                 const sender = messageData[0];
                 const messageText = messageData[1];
-                const timestamp = messageData[2] || null; // Use provided timestamp or null if not available
+                const timestamp = messageData[2] || null;
                 
                 appendMessage(sender, messageText, timestamp);
             });
 
-            // Scroll to bottom
             const messagesArea = document.getElementById("messagesArea");
             if (messagesArea) {
                 messagesArea.scrollTop = messagesArea.scrollHeight;
             }
         }
 
-        // WebSocket connection - FIXED VERSION
+        // WebSocket connection - SIMPLIFIED
         function connect(userId) {
             try {
                 const protocol = window.location.protocol === "https:" ? "wss" : "ws";
@@ -465,45 +454,13 @@
 
                 ws.onopen = () => console.log("WebSocket connected:", wsUrl);
                 ws.onmessage = (event) => {
-                    // Don't process messages while loading history
-                    if (isLoadingHistory) {
-                        console.log("Ignoring WebSocket message during history load");
-                        return;
-                    }
+                    const messageText = event.data;
+                    const [sender, ...messageParts] = messageText.split(":");
+                    const actualMessage = messageParts.join(":").trim();
+                    const senderTrim = sender.trim();
                     
-                    try {
-                        // Try to parse as JSON first
-                        const data = JSON.parse(event.data);
-                        console.log("WebSocket JSON message received:", data);
-                        
-                        // Handle different message formats
-                        if (typeof data === 'object' && data.to && data.msg) {
-                            // This is a message sent by us, ignore it in onmessage
-                            console.log("Ignoring own message in WebSocket");
-                            return;
-                        }
-                        
-                        // If it's a string message from other users
-                        if (typeof data === 'string') {
-                            const [sender, ...messageParts] = data.split(":");
-                            const actualMessage = messageParts.join(":").trim();
-                            const senderTrim = sender.trim();
-                            
-                            if (senderTrim === currentUser || senderTrim === activeChatUser) {
-                                appendMessage(senderTrim, actualMessage);
-                            }
-                        }
-                    } catch (e) {
-                        // If not JSON, treat as plain text
-                        console.log("WebSocket text message received:", event.data);
-                        const messageText = event.data;
-                        const [sender, ...messageParts] = messageText.split(":");
-                        const actualMessage = messageParts.join(":").trim();
-                        const senderTrim = sender.trim();
-                        
-                        if (senderTrim === currentUser || senderTrim === activeChatUser) {
-                            appendMessage(senderTrim, actualMessage);
-                        }
+                    if (senderTrim === currentUser || senderTrim === activeChatUser) {
+                        appendMessage(senderTrim, actualMessage);
                     }
                 };
                 ws.onerror = (e) => console.error("WebSocket error:", e);
@@ -513,7 +470,7 @@
             }
         }
 
-        // Send message - FIXED VERSION
+        // Send message
         function sendMessage() {
             const msgInput = document.getElementById("messageInput");
             if (!msgInput) return;
@@ -523,23 +480,16 @@
             if (!activeChatUser) return alert("Please select a contact first.");
 
             if (ws && ws.readyState === WebSocket.OPEN) {
-                // Send as JSON object to avoid confusion
-                const messageObj = { to: activeChatUser, msg: msg };
-                ws.send(JSON.stringify(messageObj));
-                console.log("Message sent:", messageObj);
-                
-                // Append message locally immediately
+                ws.send(JSON.stringify({ to: activeChatUser, msg: msg }));
                 appendMessage(currentUser, msg);
                 msgInput.value = "";
-                
-                // Keep focus on input for continuous typing
                 msgInput.focus();
             } else {
                 alert("WebSocket is not connected.");
             }
         }
 
-        // Append message to chat - UPDATED to handle timestamps
+        // Append message to chat
         function appendMessage(sender, messageText, timestamp = null) {
             const messagesContainer = document.getElementById("messagesContainer");
             if (!messagesContainer) return;
@@ -552,7 +502,6 @@
                 wrapper.className = "flex justify-start";
             }
 
-            // Use provided timestamp or generate current time
             const timeString = timestamp || new Date().toLocaleTimeString('en-US', {
                 hour: 'numeric',
                 minute: '2-digit',
@@ -573,14 +522,13 @@
             wrapper.appendChild(bubble);
             messagesContainer.appendChild(wrapper);
 
-            // Scroll to bottom
             const messagesArea = document.getElementById("messagesArea");
             if (messagesArea) {
                 messagesArea.scrollTop = messagesArea.scrollHeight;
             }
         }
 
-        // Unique Key Modal functions
+        // Modal functions
         function openUniqueKeyModal() {
             document.getElementById("uniqueKeyModal").classList.remove("hidden");
             document.getElementById("uniqueKeyInput").value = "";
@@ -629,7 +577,6 @@
             }
         }
 
-        // Add User Modal functions
         function openAddUserModal() {
             document.getElementById("addUserModal").classList.remove("hidden");
             document.getElementById("addUserMessage").textContent = "";

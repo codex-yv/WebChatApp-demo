@@ -1,5 +1,5 @@
 from config.mongoConfig import client
-
+from .lastseen import get_last_seen
 async def update_user_cred_one(collection_name, password_value, field_name,  new_value):
 
     db = client["Users"]
@@ -33,4 +33,13 @@ async def update_contact_keys(collection_name, field_name, field_value, new_cont
     )
 
 
+async def update_last_seen(collection_name):
+    db = client["Users"]
+    collection = db[collection_name]
+    documents = await collection.find({}, {"_id": 0}).to_list(None)
+    password = documents[0]['password']
 
+    await collection.update_one(
+        {"password":password},
+        {"$set":{"status":get_last_seen()}}
+    )
