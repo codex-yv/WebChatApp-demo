@@ -57,7 +57,7 @@
 
 <body class="bg-gray-900 h-screen overflow-hidden">
     <div class="flex flex-col h-screen">
-        <!-- Main Header -->
+        <!-- Main Header - ALWAYS VISIBLE -->
         <header class="bg-gray-800 text-white px-4 py-3 md:px-6 md:py-3 flex items-center justify-between border-b border-gray-700">
             <div class="flex items-center gap-3">
                 <div class="font-['Pacifico'] text-xl md:text-2xl text-primary">Whispr</div>
@@ -112,7 +112,7 @@
 
             <!-- Chat Area -->
             <div class="flex-1 flex flex-col bg-gray-900 h-full hidden md:flex" id="chatArea">
-                <!-- Chat Header -->
+                <!-- Chat Header - Only shows contact info, NOT the main header -->
                 <div class="bg-gray-800 border-b border-gray-700 px-4 py-3 md:px-6 md:py-3 flex items-center gap-3 flex-shrink-0"
                     id="chatHeader">
                     <button class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-gray-700 rounded-full transition-colors md:hidden"
