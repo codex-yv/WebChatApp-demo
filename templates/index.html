@@ -111,7 +111,7 @@
             </div>
 
             <!-- Chat Area -->
-            <div class="flex-1 flex flex-col bg-gray-900 h-full hidden md:flex" id="chatArea">
+            <div class="flex-1 flex flex-col bg-gray-900 h-full" id="chatArea">
                 <!-- Chat Header - Only shows contact info, NOT the main header -->
                 <div class="bg-gray-800 border-b border-gray-700 px-4 py-3 md:px-6 md:py-3 flex items-center gap-3 flex-shrink-0"
                     id="chatHeader">
@@ -204,6 +204,7 @@
         let currentUser;
         let activeChatUser = null;
         let contacts = [];
+        let isLoadingHistory = false; // ADD THIS FLAG
 
         // Initialize application
         window.onload = () => {
@@ -251,6 +252,9 @@
                 sidebar.classList.remove('hidden');
                 chatArea.classList.remove('hidden');
             }
+            
+            // Ensure main header is always visible
+            document.querySelector('header').classList.remove('hidden');
         }
 
         // Initialize UI event listeners
@@ -302,6 +306,8 @@
             if (window.innerWidth < 768) {
                 document.getElementById('sidebar').classList.remove('hidden');
                 document.getElementById('chatArea').classList.add('hidden');
+                // Ensure main header is visible when going back to contacts
+                document.querySelector('header').classList.remove('hidden');
                 // Reset chat header to default state when going back to contacts
                 resetChatHeader();
             }
@@ -312,6 +318,8 @@
             if (window.innerWidth < 768) {
                 document.getElementById('sidebar').classList.add('hidden');
                 document.getElementById('chatArea').classList.remove('hidden');
+                // Ensure main header is visible when in chat view too
+                document.querySelector('header').classList.remove('hidden');
             }
         }
 
@@ -364,8 +372,11 @@
                 contactEl.appendChild(avatar);
                 contactEl.appendChild(contactInfo);
 
-                // Contact click handler
+                // Contact click handler - FIXED: Prevent message resending
                 contactEl.onclick = () => {
+                    // Don't do anything if clicking the same active contact
+                    if (activeChatUser === contact) return;
+                    
                     // Update active state
                     document.querySelectorAll('.contact-item').forEach(item => {
                         item.classList.remove('bg-primary/20', 'border-r-4', 'border-primary');
@@ -377,14 +388,14 @@
                     document.getElementById("chatContactName").textContent = contact;
                     document.getElementById("chatStatus").textContent = "Online";
                     
-                    // Clear and load chat history
+                    // Clear and load chat history - THIS SHOULD NOT TRIGGER MESSAGE SENDING
                     document.getElementById("messagesContainer").innerHTML = "";
                     loadChatHistory(currentUser, contact);
 
                     // Switch to chat view on mobile
                     showChatView();
                     
-                    // Focus input for immediate typing
+                    // Focus input for immediate typing - BUT DON'T SEND ANY MESSAGE
                     setTimeout(() => {
                         const messageInput = document.getElementById('messageInput');
                         if (messageInput) messageInput.focus();
@@ -395,8 +406,10 @@
             });
         }
 
-        // Load chat history
+        // Load chat history - FIXED VERSION
         async function loadChatHistory(user, contact) {
+            isLoadingHistory = true; // Set flag to prevent WebSocket processing
+            
             try {
                 const response = await fetch("/chat-history", {
                     method: "POST",
@@ -412,6 +425,11 @@
                 }
             } catch (err) {
                 console.error("Error fetching chat history:", err);
+            } finally {
+                // Reset flag after a short delay to ensure all WebSocket messages are processed
+                setTimeout(() => {
+                    isLoadingHistory = false;
+                }, 1000);
             }
         }
 
@@ -438,7 +456,7 @@
             }
         }
 
-        // WebSocket connection
+        // WebSocket connection - FIXED VERSION
         function connect(userId) {
             try {
                 const protocol = window.location.protocol === "https:" ? "wss" : "ws";
@@ -447,12 +465,45 @@
 
                 ws.onopen = () => console.log("WebSocket connected:", wsUrl);
                 ws.onmessage = (event) => {
-                    const [sender, ...messageParts] = event.data.split(":");
-                    const messageText = messageParts.join(":").trim();
-                    const senderTrim = sender.trim();
+                    // Don't process messages while loading history
+                    if (isLoadingHistory) {
+                        console.log("Ignoring WebSocket message during history load");
+                        return;
+                    }
                     
-                    if (senderTrim === currentUser || senderTrim === activeChatUser) {
-                        appendMessage(senderTrim, messageText);
+                    try {
+                        // Try to parse as JSON first
+                        const data = JSON.parse(event.data);
+                        console.log("WebSocket JSON message received:", data);
+                        
+                        // Handle different message formats
+                        if (typeof data === 'object' && data.to && data.msg) {
+                            // This is a message sent by us, ignore it in onmessage
+                            console.log("Ignoring own message in WebSocket");
+                            return;
+                        }
+                        
+                        // If it's a string message from other users
+                        if (typeof data === 'string') {
+                            const [sender, ...messageParts] = data.split(":");
+                            const actualMessage = messageParts.join(":").trim();
+                            const senderTrim = sender.trim();
+                            
+                            if (senderTrim === currentUser || senderTrim === activeChatUser) {
+                                appendMessage(senderTrim, actualMessage);
+                            }
+                        }
+                    } catch (e) {
+                        // If not JSON, treat as plain text
+                        console.log("WebSocket text message received:", event.data);
+                        const messageText = event.data;
+                        const [sender, ...messageParts] = messageText.split(":");
+                        const actualMessage = messageParts.join(":").trim();
+                        const senderTrim = sender.trim();
+                        
+                        if (senderTrim === currentUser || senderTrim === activeChatUser) {
+                            appendMessage(senderTrim, actualMessage);
+                        }
                     }
                 };
                 ws.onerror = (e) => console.error("WebSocket error:", e);
@@ -462,7 +513,7 @@
             }
         }
 
-        // Send message
+        // Send message - FIXED VERSION
         function sendMessage() {
             const msgInput = document.getElementById("messageInput");
             if (!msgInput) return;
@@ -472,7 +523,12 @@
             if (!activeChatUser) return alert("Please select a contact first.");
 
             if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ to: activeChatUser, msg }));
+                // Send as JSON object to avoid confusion
+                const messageObj = { to: activeChatUser, msg: msg };
+                ws.send(JSON.stringify(messageObj));
+                console.log("Message sent:", messageObj);
+                
+                // Append message locally immediately
                 appendMessage(currentUser, msg);
                 msgInput.value = "";
                 

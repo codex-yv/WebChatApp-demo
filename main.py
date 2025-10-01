@@ -138,9 +138,7 @@ async def submitRegister(request: Request, values:SignUp = Form(...)):
         return templates.TemplateResponse("index.html", {"request": request, "user": values.username, "chat_history":[], "contacts": contacts})
     else:
         return 0
-    
 
-from fastapi import Body
 
 @app.post("/chat-history")
 async def chat_history(data: dict = Body(...)):
